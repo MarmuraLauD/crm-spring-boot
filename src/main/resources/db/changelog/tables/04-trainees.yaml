@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 04-create-trainees-table
+      author: developer
+      changes:
+        - createTable:
+            tableName: trainees
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_trainees_users
+                    references: users(user_id)
+              - column:
+                  name: date_of_birth
+                  type: DATE
+              - column:
+                  name: address
+                  type: VARCHAR(255)
