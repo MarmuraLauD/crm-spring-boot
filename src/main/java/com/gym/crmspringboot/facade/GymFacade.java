@@ -3,9 +3,11 @@ package com.gym.crmspringboot.facade;
 import com.gym.crmspringboot.model.Trainee;
 import com.gym.crmspringboot.model.Trainer;
 import com.gym.crmspringboot.model.Training;
+import com.gym.crmspringboot.model.TrainingType;
 import com.gym.crmspringboot.service.TraineeService;
 import com.gym.crmspringboot.service.TrainerService;
 import com.gym.crmspringboot.service.TrainingService;
+import com.gym.crmspringboot.service.TrainingTypeService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -19,8 +21,9 @@ public class GymFacade {
     private final TraineeService traineeService;
     private final TrainerService trainerService;
     private final TrainingService trainingService;
+    private final TrainingTypeService trainingTypeService;
 
-    public Trainee createTrainee(Trainee trainee) {
+    public Trainee registerTrainee(Trainee trainee) {
         return traineeService.createTrainee(trainee);
     }
 
@@ -52,7 +55,7 @@ public class GymFacade {
         return traineeService.updateTrainersList(username, password, trainerUsernames);
     }
 
-    public Trainer createTrainer(Trainer trainer) {
+    public Trainer registerTrainer(Trainer trainer) {
         return trainerService.create(trainer);
     }
 
@@ -86,7 +89,7 @@ public class GymFacade {
             LocalDate from,
             LocalDate to,
             String trainerName,
-            String typeName
+            String trainingType
     ) {
         return trainingService.getTraineeTrainingsList(
                 username,
@@ -94,7 +97,7 @@ public class GymFacade {
                 from,
                 to,
                 trainerName,
-                typeName
+                trainingType
         );
     }
 
@@ -104,7 +107,7 @@ public class GymFacade {
             LocalDate from,
             LocalDate to,
             String traineeName,
-            String typeName
+            String trainingType
     ) {
         return trainingService.getTrainerTrainingsList(
                 username,
@@ -112,7 +115,16 @@ public class GymFacade {
                 from,
                 to,
                 traineeName,
-                typeName
+                trainingType
         );
     }
+
+    public List<TrainingType> getAllTrainingTypes() {
+        return trainingTypeService.getAllTrainingTypes();
+    }
+
+    public List<Trainer> getUnassignedActiveTrainers(String traineeUsername) {
+        return trainerService.getUnassignedActiveTrainers(traineeUsername);
+    }
+
 }
