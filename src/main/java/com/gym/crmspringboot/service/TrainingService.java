@@ -15,7 +15,7 @@ public interface TrainingService {
             LocalDate from,
             LocalDate to,
             String trainerName,
-            String typeName
+            String trainingType
     );
     List<Training> getTrainerTrainingsList(
             String username,
@@ -23,7 +23,7 @@ public interface TrainingService {
             LocalDate from,
             LocalDate to,
             String traineeName,
-            String typeName
+            String trainingType
     );
 
 }

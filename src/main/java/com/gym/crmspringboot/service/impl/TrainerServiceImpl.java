@@ -5,6 +5,7 @@ import com.gym.crmspringboot.repository.TrainerRepository;
 import com.gym.crmspringboot.service.TrainerService;
 import com.gym.crmspringboot.service.helper.CredentialsService;
 import com.gym.crmspringboot.service.security.RequireAuth;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TrainerServiceImpl implements TrainerService {
 
-    private final TrainerRepository trainerDao;
+    private final TrainerRepository trainerRepository;
     private final CredentialsService credentialsService;
 
     @Override
@@ -34,7 +35,7 @@ public class TrainerServiceImpl implements TrainerService {
         );
         trainer.setUsername(username);
         trainer.setActive(true);
-        Trainer savedTrainer = trainerDao.save(trainer);
+        Trainer savedTrainer = trainerRepository.save(trainer);
         log.info("Trainer profile created with username: {}", savedTrainer.getUsername());
 
         return savedTrainer;
@@ -45,7 +46,7 @@ public class TrainerServiceImpl implements TrainerService {
     @RequireAuth
     public Trainer update(String username, String password, Trainer trainer) {
         log.info("Updating trainer profile with username: {}", trainer.getUsername());
-        return trainerDao.update(trainer);
+        return trainerRepository.update(trainer);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class TrainerServiceImpl implements TrainerService {
     @RequireAuth
     public Optional<Trainer> findByUsername(String username, String password) {
         log.info("Finding trainer profile with username: {}", username);
-        return trainerDao.findByUsername(username);
+        return trainerRepository.findByUsername(username);
     }
 
     @Override
@@ -61,7 +62,7 @@ public class TrainerServiceImpl implements TrainerService {
     @RequireAuth
     public void changePassword(String username, String oldPassword, String newPassword) {
         log.info("Changing password for trainer with username: {}", username);
-        Optional<Trainer> optionalTrainer = trainerDao.findByUsername(username);
+        Optional<Trainer> optionalTrainer = trainerRepository.findByUsername(username);
 
         if (optionalTrainer.isPresent()) {
             Trainer trainer = optionalTrainer.get();
@@ -84,7 +85,7 @@ public class TrainerServiceImpl implements TrainerService {
     public void toggleActive(String username, String password) {
         log.info("Toggling active status for trainer with username: {}", username);
 
-        Optional<Trainer> trainerOpt = trainerDao.findByUsername(username);
+        Optional<Trainer> trainerOpt = trainerRepository.findByUsername(username);
         if (trainerOpt.isPresent()) {
             Trainer trainer = trainerOpt.get();
             trainer.setActive(!trainer.isActive());
@@ -93,6 +94,14 @@ public class TrainerServiceImpl implements TrainerService {
             log.warn("Trainer with username {} not found.", username);
             throw new IllegalArgumentException("Trainer not found.");
         }
+    }
+
+    @Override
+    @Transactional
+    @RequireAuth
+    public List<Trainer> getUnassignedActiveTrainers(String traineeUsername) {
+        log.info("Getting unassigned active trainers for username: {}", traineeUsername);
+        return trainerRepository.getUnassignedTrainers(traineeUsername);
     }
 
 }

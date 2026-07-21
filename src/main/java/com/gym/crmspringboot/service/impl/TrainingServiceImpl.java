@@ -44,9 +44,9 @@ public class TrainingServiceImpl implements TrainingService {
             LocalDate from,
             LocalDate to,
             String trainerName,
-            String typeName
+            String trainingType
     ) {
-        return trainingRepository.getTraineeTrainingsByCriteria(username, from, to, trainerName, typeName);
+        return trainingRepository.getTraineeTrainingsByCriteria(username, from, to, trainerName, trainingType);
     }
 
 
@@ -59,8 +59,8 @@ public class TrainingServiceImpl implements TrainingService {
             LocalDate from,
             LocalDate to,
             String traineeName,
-            String typeName
+            String trainingType
     ) {
-        return trainingRepository.getTrainerTrainingsByCriteria(username, from, to, traineeName, typeName);
+        return trainingRepository.getTrainerTrainingsByCriteria(username, from, to, traineeName, trainingType);
     }
 }
