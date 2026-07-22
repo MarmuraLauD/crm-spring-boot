@@ -8,6 +8,7 @@ import com.gym.crmspringboot.service.TraineeService;
 import com.gym.crmspringboot.service.TrainerService;
 import com.gym.crmspringboot.service.TrainingService;
 import com.gym.crmspringboot.service.TrainingTypeService;
+import com.gym.crmspringboot.service.UserService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class GymFacade {
     private final TrainerService trainerService;
     private final TrainingService trainingService;
     private final TrainingTypeService trainingTypeService;
+    private final UserService userService;
 
     public Trainee registerTrainee(Trainee trainee) {
         return traineeService.createTrainee(trainee);
@@ -39,12 +41,12 @@ public class GymFacade {
         return traineeService.findByUsername(username, password);
     }
 
-    public void changeTraineePassword(String username, String oldPassword, String newPassword) {
-        traineeService.changePassword(username, oldPassword, newPassword);
+    public void changeUserPassword(String username, String oldPassword, String newPassword) {
+        userService.changePassword(username, oldPassword, newPassword);
     }
 
-    public void toggleTraineeActive(String username, String password) {
-        traineeService.toggleActive(username, password);
+    public void toggleUserActive(String username, String password) {
+        userService.toggleActive(username, password);
     }
 
     public List<Trainer> updateTraineesTrainerList(
@@ -65,14 +67,6 @@ public class GymFacade {
 
     public Optional<Trainer> getTrainerByUsername(String username, String password) {
         return trainerService.findByUsername(username, password);
-    }
-
-    public void changeTrainerPassword(String username, String oldPassword, String newPassword) {
-        trainerService.changePassword(username, oldPassword, newPassword);
-    }
-
-    public void toggleTrainerActive(String username, String password) {
-        trainerService.toggleActive(username, password);
     }
 
     public Training createTraining(String username, String password, Training training) {
@@ -123,8 +117,8 @@ public class GymFacade {
         return trainingTypeService.getAllTrainingTypes();
     }
 
-    public List<Trainer> getUnassignedActiveTrainers(String traineeUsername) {
-        return trainerService.getUnassignedActiveTrainers(traineeUsername);
+    public List<Trainer> getUnassignedActiveTrainers(String username, String password, String traineeUsername) {
+        return trainerService.getUnassignedActiveTrainers(username, password, traineeUsername);
     }
 
 }

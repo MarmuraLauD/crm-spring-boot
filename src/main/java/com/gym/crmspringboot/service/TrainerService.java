@@ -9,8 +9,6 @@ public interface TrainerService {
     Trainer create(Trainer trainer);
     Trainer update(String username, String password, Trainer trainer);
     Optional<Trainer> findByUsername(String username, String password);
-    void changePassword(String username, String oldPassword, String newPassword);
-    void toggleActive(String username, String password);
-    List<Trainer> getUnassignedActiveTrainers(String traineeUsername);
+    List<Trainer> getUnassignedActiveTrainers(String username, String password, String traineeUsername);
 
 }

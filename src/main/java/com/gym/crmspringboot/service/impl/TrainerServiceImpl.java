@@ -60,46 +60,7 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional
     @RequireAuth
-    public void changePassword(String username, String oldPassword, String newPassword) {
-        log.info("Changing password for trainer with username: {}", username);
-        Optional<Trainer> optionalTrainer = trainerRepository.findByUsername(username);
-
-        if (optionalTrainer.isPresent()) {
-            Trainer trainer = optionalTrainer.get();
-            if (credentialsService.authenticate(username, oldPassword)) {
-                trainer.setPassword(newPassword);
-                log.info("Password changed successfully for trainer with username: {}", username);
-            } else {
-                log.warn("Old password does not match for trainer with username: {}", username);
-                throw new IllegalArgumentException("Old password does not match.");
-            }
-        } else {
-            log.warn("Trainer with username {} not found.", username);
-            throw new IllegalArgumentException("Trainer not found.");
-        }
-    }
-
-    @Override
-    @Transactional
-    @RequireAuth
-    public void toggleActive(String username, String password) {
-        log.info("Toggling active status for trainer with username: {}", username);
-
-        Optional<Trainer> trainerOpt = trainerRepository.findByUsername(username);
-        if (trainerOpt.isPresent()) {
-            Trainer trainer = trainerOpt.get();
-            trainer.setActive(!trainer.isActive());
-            log.info("Trainer with username: {} is now {}", username, trainer.isActive() ? "active" : "inactive");
-        } else {
-            log.warn("Trainer with username {} not found.", username);
-            throw new IllegalArgumentException("Trainer not found.");
-        }
-    }
-
-    @Override
-    @Transactional
-    @RequireAuth
-    public List<Trainer> getUnassignedActiveTrainers(String traineeUsername) {
+    public List<Trainer> getUnassignedActiveTrainers(String username, String password, String traineeUsername) {
         log.info("Getting unassigned active trainers for username: {}", traineeUsername);
         return trainerRepository.getUnassignedTrainers(traineeUsername);
     }

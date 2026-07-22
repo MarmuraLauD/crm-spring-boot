@@ -79,40 +79,6 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @RequireAuth
     @Transactional
-    public void changePassword(String username, String oldPassword, String newPassword) {
-        log.info("Changing password for trainee with username: {}", username);
-
-        Optional<Trainee> traineeOpt = traineeRepository.findByUsername(username);
-        if (traineeOpt.isPresent()) {
-            Trainee trainee = traineeOpt.get();
-            trainee.setPassword(newPassword);
-            log.info("Password changed successfully for trainee with username: {}", username);
-        } else {
-            log.warn("Trainee not found with username: {}", username);
-            throw new IllegalArgumentException("Trainee not found with username: " + username);
-        }
-    }
-
-    @Override
-    @RequireAuth
-    @Transactional
-    public void toggleActive(String username, String password) {
-        log.info("Toggling active status for trainee with username: {}", username);
-
-        Optional<Trainee> traineeOpt = traineeRepository.findByUsername(username);
-        if (traineeOpt.isPresent()) {
-            Trainee trainee = traineeOpt.get();
-            trainee.setActive(!trainee.isActive());
-            log.info("Trainee with username: {} is now {}", username, trainee.isActive() ? "active" : "inactive");
-        } else {
-            log.warn("Trainee not found with username: {}", username);
-            throw new IllegalArgumentException("Trainee not found with username: " + username);
-        }
-    }
-
-    @Override
-    @RequireAuth
-    @Transactional
     public List<Trainer> updateTrainersList(String username, String password, List<String> trainerUsernames) {
         Trainee trainee = traineeRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Trainee not found"));

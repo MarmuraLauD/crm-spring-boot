@@ -12,7 +12,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,7 +30,7 @@ public class TrainerController {
     private final GymFacade gymFacade;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public RegistrationResponse registerTrainer(@Valid @RequestBody TrainerRegistrationRequest request) {
         Trainer trainer = trainerMapper.toEntity(request);
         Trainer createdTrainer = gymFacade.registerTrainer(trainer);
@@ -65,19 +64,12 @@ public class TrainerController {
     @ResponseStatus(HttpStatus.OK)
     public Object getUnassignedTrainers(
             @RequestParam String username,
-            @RequestParam String password) {
-        List<Trainer> unassignedTrainers = gymFacade.getUnassignedActiveTrainers(username);
+            @RequestParam String password,
+            @RequestParam String traineeUsername) {
+        List<Trainer> unassignedTrainers = gymFacade.getUnassignedActiveTrainers(username, password, traineeUsername);
         return unassignedTrainers.stream()
                 .map(trainerMapper::toItemResponse)
                 .toList();
-    }
-
-    @PatchMapping("/{username}/status")
-    @ResponseStatus(HttpStatus.OK)
-    public void toggleTrainerStatus(
-            @PathVariable String username,
-            @RequestParam String password) {
-        gymFacade.toggleTrainerActive(username, password);
     }
 
 }
