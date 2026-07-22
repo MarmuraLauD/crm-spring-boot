@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 07-insert-training-types
+      author: developer
+      changes:
+        - insert:
+            tableName: training_types
+            columns:
+              - column:
+                  name: training_type_name
+                  value: "YOGA"
+        - insert:
+            tableName: training_types
+            columns:
+              - column:
+                  name: training_type_name
+                  value: "FITNESS"
+        - insert:
+            tableName: training_types
+            columns:
+              - column:
+                  name: training_type_name
+                  value: "ZUMBA"
+        - insert:
+            tableName: training_types
+            columns:
+              - column:
+                  name: training_type_name
+                  value: "STRENGTH"
+        - insert:
+            tableName: training_types
+            columns:
+              - column:
+                  name: training_type_name
+                  value: "CARDIO"

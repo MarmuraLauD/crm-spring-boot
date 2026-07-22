@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/tables/05-trainee-trainer.yaml
   - include:
       file: db/changelog/tables/06-trainings.yaml
+  - include:
+      file: db/changelog/tables/07-insert-training-types.yaml
