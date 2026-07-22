@@ -1,5 +1,6 @@
 package com.gym.crmspringboot.controller;
 
+import com.gym.crmspringboot.controller.api.TrainerApi;
 import com.gym.crmspringboot.dto.request.TrainerRegistrationRequest;
 import com.gym.crmspringboot.dto.request.UpdateTrainerRequest;
 import com.gym.crmspringboot.dto.response.RegistrationResponse;
@@ -25,11 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/trainers")
 @RequiredArgsConstructor
-public class TrainerController {
+public class TrainerController implements TrainerApi {
 
     private final TrainerMapper trainerMapper;
     private final GymFacade gymFacade;
 
+    @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public RegistrationResponse registerTrainer(@Valid @RequestBody TrainerRegistrationRequest request) {
@@ -38,6 +40,7 @@ public class TrainerController {
         return new RegistrationResponse(createdTrainer.getUsername(), createdTrainer.getPassword());
     }
 
+    @Override
     @GetMapping("/{username}")
     @ResponseStatus(HttpStatus.OK)
     public TrainerProfileResponse getTrainerProfile(
@@ -49,6 +52,7 @@ public class TrainerController {
         return trainerMapper.toProfileResponse(trainer);
     }
 
+    @Override
     @PutMapping("/{username}")
     @ResponseStatus(HttpStatus.OK)
     public TrainerProfileResponse updateTrainerProfile(
@@ -61,6 +65,7 @@ public class TrainerController {
         return trainerMapper.toProfileResponse(updatedTrainer);
     }
 
+    @Override
     @GetMapping("/unassigned")
     @ResponseStatus(HttpStatus.OK)
     public List<TrainerItemResponse> getUnassignedTrainers(

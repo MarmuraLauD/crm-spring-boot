@@ -1,6 +1,7 @@
 package com.gym.crmspringboot.controller;
 
 
+import com.gym.crmspringboot.controller.api.TraineeApi;
 import com.gym.crmspringboot.dto.request.TraineeRegistrationRequest;
 import com.gym.crmspringboot.dto.request.UpdateTraineeRequest;
 import com.gym.crmspringboot.dto.response.RegistrationResponse;
@@ -29,12 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/trainees")
 @RequiredArgsConstructor
-public class TraineeController {
+public class TraineeController implements TraineeApi {
 
     private final GymFacade gymFacade;
     private final TraineeMapper traineeMapper;
     private final TrainerMapper trainerMapper;
 
+    @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public RegistrationResponse registerTrainee(@Valid @RequestBody TraineeRegistrationRequest request) {
@@ -45,6 +47,7 @@ public class TraineeController {
         return new RegistrationResponse(createdTrainee.getUsername(), createdTrainee.getPassword());
     }
 
+    @Override
     @GetMapping("/{username}")
     @ResponseStatus(HttpStatus.OK)
     public TraineeProfileResponse getTraineeProfile(
@@ -56,6 +59,7 @@ public class TraineeController {
         return traineeMapper.toProfileResponse(trainee);
     }
 
+    @Override
     @PutMapping("/{username}")
     @ResponseStatus(HttpStatus.OK)
     public TraineeProfileResponse updateTraineeProfile(
@@ -68,6 +72,7 @@ public class TraineeController {
         return traineeMapper.toProfileResponse(updatedTrainee);
     }
 
+    @Override
     @DeleteMapping("/{username}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteTraineeProfile(
@@ -76,6 +81,7 @@ public class TraineeController {
         gymFacade.deleteTrainee(username, password);
     }
 
+    @Override
     @PutMapping("/{username}/trainers")
     @ResponseStatus(HttpStatus.OK)
     public List<TrainerItemResponse> updateTraineeTrainers(

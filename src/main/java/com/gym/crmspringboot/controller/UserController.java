@@ -1,5 +1,6 @@
 package com.gym.crmspringboot.controller;
 
+import com.gym.crmspringboot.controller.api.UserApi;
 import com.gym.crmspringboot.facade.GymFacade;
 import com.gym.crmspringboot.service.security.RequireAuth;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserApi {
 
     private final GymFacade gymFacade;
 
+    @Override
     @GetMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     @RequireAuth
     public void login(@RequestParam String username, @RequestParam String password) {
-        // This endpoint is protected by @RequireAuth, so if the credentials are valid, the user
-        // is considered logged in.
         // No further action is needed here; the aspect will handle authentication.
     }
-
+    @Override
     @PutMapping("/password")
     @ResponseStatus(HttpStatus.OK)
     public void changePassword(
@@ -38,6 +38,7 @@ public class UserController {
         gymFacade.changeUserPassword(username, oldPassword, newPassword);
     }
 
+    @Override
     @PatchMapping("/{username}/status")
     @ResponseStatus(HttpStatus.OK)
     public void toggleActive(

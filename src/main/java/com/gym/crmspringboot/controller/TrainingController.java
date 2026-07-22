@@ -1,5 +1,6 @@
 package com.gym.crmspringboot.controller;
 
+import com.gym.crmspringboot.controller.api.TrainingApi;
 import com.gym.crmspringboot.dto.request.AddTrainingRequest;
 import com.gym.crmspringboot.dto.response.TraineeTrainingItemResponse;
 import com.gym.crmspringboot.dto.response.TrainerTrainingItemResponse;
@@ -25,11 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/trainings")
 @RequiredArgsConstructor
-public class TrainingController {
+public class TrainingController implements TrainingApi {
 
     private final GymFacade gymFacade;
     private final TrainingMapper trainingMapper;
 
+    @Override
     @GetMapping("/trainee/{username}")
     @ResponseStatus(HttpStatus.OK)
     public List<TraineeTrainingItemResponse> getTraineeTrainings(
@@ -52,6 +54,7 @@ public class TrainingController {
                 .toList();
     }
 
+    @Override
     @GetMapping("/trainer/{username}")
     @ResponseStatus(HttpStatus.OK)
     public List<TrainerTrainingItemResponse> getTrainerTrainings(
@@ -73,6 +76,7 @@ public class TrainingController {
                 .toList();
     }
 
+    @Override
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public void addTraining(
@@ -83,6 +87,7 @@ public class TrainingController {
         gymFacade.createTraining(username, password, training);
     }
 
+    @Override
     @GetMapping("/types")
     @ResponseStatus(HttpStatus.OK)
     public List<TrainingTypeItemResponse> getTrainingTypes() {
