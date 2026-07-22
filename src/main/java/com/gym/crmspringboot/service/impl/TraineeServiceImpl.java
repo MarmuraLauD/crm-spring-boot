@@ -62,7 +62,7 @@ public class TraineeServiceImpl implements TraineeService {
         Optional<Trainee> traineeOpt = traineeRepository.findByUsername(username);
 
         if (traineeOpt.isPresent()) {
-            traineeRepository.delete(username);
+            traineeRepository.deleteByUsername(username);
         } else {
             throw new IllegalArgumentException("Trainee not found");
         }
@@ -83,7 +83,7 @@ public class TraineeServiceImpl implements TraineeService {
         Trainee trainee = traineeRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Trainee not found"));
 
-        List<Trainer> newTrainers = trainerRepository.findByUsernames(trainerUsernames);
+        List<Trainer> newTrainers = trainerRepository.findByUsernameIn(trainerUsernames);
 
         trainee.setTrainers(new HashSet<>(newTrainers));
 

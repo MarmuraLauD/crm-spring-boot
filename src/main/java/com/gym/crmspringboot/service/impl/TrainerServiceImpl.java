@@ -62,7 +62,7 @@ public class TrainerServiceImpl implements TrainerService {
     @RequireAuth
     public List<Trainer> getUnassignedActiveTrainers(String username, String password, String traineeUsername) {
         log.info("Getting unassigned active trainers for username: {}", traineeUsername);
-        return trainerRepository.getUnassignedTrainers(traineeUsername);
+        return trainerRepository.getUnassignedActiveTrainers(traineeUsername);
     }
 
 }

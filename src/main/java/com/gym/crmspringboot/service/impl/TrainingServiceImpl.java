@@ -2,6 +2,7 @@ package com.gym.crmspringboot.service.impl;
 
 import com.gym.crmspringboot.model.Training;
 import com.gym.crmspringboot.repository.TrainingRepository;
+import com.gym.crmspringboot.repository.specification.TrainingSpecifications;
 import com.gym.crmspringboot.service.TrainingService;
 import com.gym.crmspringboot.service.security.RequireAuth;
 import java.time.LocalDate;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +37,6 @@ public class TrainingServiceImpl implements TrainingService {
         return trainingRepository.findById(id);
     }
 
-    @Override
     @RequireAuth
     @Transactional(readOnly = true)
     public List<Training> getTraineeTrainingsList(
@@ -46,11 +47,13 @@ public class TrainingServiceImpl implements TrainingService {
             String trainerName,
             String trainingType
     ) {
-        return trainingRepository.getTraineeTrainingsByCriteria(username, from, to, trainerName, trainingType);
+        Specification<Training> spec = TrainingSpecifications.filterTrainings(
+                username, false, from, to, trainerName, trainingType
+        );
+        return trainingRepository.findAll(spec);
     }
 
 
-    @Override
     @RequireAuth
     @Transactional(readOnly = true)
     public List<Training> getTrainerTrainingsList(
@@ -61,6 +64,12 @@ public class TrainingServiceImpl implements TrainingService {
             String traineeName,
             String trainingType
     ) {
-        return trainingRepository.getTrainerTrainingsByCriteria(username, from, to, traineeName, trainingType);
+        Specification<Training> spec = TrainingSpecifications.filterTrainings(
+                username, true, from, to, traineeName, trainingType
+        );
+        return trainingRepository.findAll(spec);
     }
+
+
+
 }
