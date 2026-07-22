@@ -15,3 +15,8 @@ spring:
       auto: validate
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+  logging:
+    pattern:
+      console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [txn: %X{transactionId}] - %msg%n"
+    level:
+      com.gym.crmspringboot: INFO
