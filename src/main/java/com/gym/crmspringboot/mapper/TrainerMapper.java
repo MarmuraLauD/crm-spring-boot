@@ -14,7 +14,7 @@ public interface TrainerMapper {
     @Mapping(target = "specialization.id", source = "specializationId")
     Trainer toEntity(TrainerRegistrationRequest request);
 
-    @Mapping(target = "specialization.trainingTypeName", source = "specialization")
+    @Mapping(target = "specialization", ignore = true)
     Trainer toEntity(UpdateTrainerRequest request);
 
     @Mapping(target = "specialization", source = "specialization.trainingTypeName")

@@ -37,17 +37,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @RequireAuth
     @Transactional
-    public void toggleActive(String username, String password) {
+    public void toggleActive(String username, String password, Boolean status) {
         log.info("Toggling active status for user with username: {}", username);
 
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            user.setActive(!user.isActive());
-            log.info("User with username: {} is now {}", username, user.isActive() ? "active" : "inactive");
-        } else {
-            log.warn("User not found with username: {}", username);
-            throw new IllegalArgumentException("User not found with username: " + username);
-        }
+        User user = userRepository.findByUsername(username).
+                orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
+        user.setActive(status);
+        log.info("User with username: {} is now {}", username, user.isActive() ? "active" : "inactive");
+
     }
 }

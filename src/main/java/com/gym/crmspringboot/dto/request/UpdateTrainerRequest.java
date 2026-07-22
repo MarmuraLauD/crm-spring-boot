@@ -1,5 +1,6 @@
 package com.gym.crmspringboot.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -8,7 +9,8 @@ public record UpdateTrainerRequest(
         @NotBlank String username,
         @NotBlank String firstName,
         @NotBlank String lastName,
-        @NotBlank String specialization,
+        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+        String specialization,
         @NotNull Boolean isActive
 
 ) { }

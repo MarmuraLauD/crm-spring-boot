@@ -42,8 +42,9 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public void toggleActive(
             @PathVariable String username,
-            @RequestParam String password) {
-        gymFacade.toggleUserActive(username, password);
+            @RequestParam String password,
+            @RequestParam Boolean status) {
+        gymFacade.toggleUserActive(username, password, status);
     }
 
 }

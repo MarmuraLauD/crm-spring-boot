@@ -45,8 +45,8 @@ public class GymFacade {
         userService.changePassword(username, oldPassword, newPassword);
     }
 
-    public void toggleUserActive(String username, String password) {
-        userService.toggleActive(username, password);
+    public void toggleUserActive(String username, String password, Boolean status) {
+        userService.toggleActive(username, password, status);
     }
 
     public List<Trainer> updateTraineesTrainerList(
@@ -69,12 +69,8 @@ public class GymFacade {
         return trainerService.findByUsername(username, password);
     }
 
-    public Training createTraining(String username, String password, Training training) {
-        return trainingService.create(username, password, training);
-    }
-
-    public Optional<Training> getTrainingById(String username, String password, Long id) {
-        return trainingService.findById(username, password, id);
+    public void createTraining(String username, String password, Training training) {
+        trainingService.create(username, password, training);
     }
 
     public List<Training> getTraineeTrainingsList(

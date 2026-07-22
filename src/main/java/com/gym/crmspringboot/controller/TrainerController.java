@@ -3,6 +3,7 @@ package com.gym.crmspringboot.controller;
 import com.gym.crmspringboot.dto.request.TrainerRegistrationRequest;
 import com.gym.crmspringboot.dto.request.UpdateTrainerRequest;
 import com.gym.crmspringboot.dto.response.RegistrationResponse;
+import com.gym.crmspringboot.dto.response.TrainerItemResponse;
 import com.gym.crmspringboot.dto.response.TrainerProfileResponse;
 import com.gym.crmspringboot.facade.GymFacade;
 import com.gym.crmspringboot.mapper.TrainerMapper;
@@ -62,7 +63,7 @@ public class TrainerController {
 
     @GetMapping("/unassigned")
     @ResponseStatus(HttpStatus.OK)
-    public Object getUnassignedTrainers(
+    public List<TrainerItemResponse> getUnassignedTrainers(
             @RequestParam String username,
             @RequestParam String password,
             @RequestParam String traineeUsername) {
