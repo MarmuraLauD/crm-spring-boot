@@ -46,7 +46,7 @@ public class TrainerServiceImpl implements TrainerService {
     @RequireAuth
     public Trainer update(String username, String password, Trainer trainer) {
         log.info("Updating trainer profile with username: {}", trainer.getUsername());
-        return trainerRepository.update(trainer);
+        return trainerRepository.save(trainer);
     }
 
     @Override

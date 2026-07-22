@@ -51,7 +51,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     public Trainee updateTrainee(String username, String password, Trainee trainee) {
         log.info("Updating trainee profile with username: {}", trainee.getUsername());
-        return traineeRepository.update(trainee);
+        return traineeRepository.save(trainee);
     }
 
     @Override
