@@ -2,7 +2,9 @@ package com.gym.crmspringboot.dto.response;
 
 import java.time.LocalDate;
 import java.util.List;
+import lombok.Builder;
 
+@Builder
 public record TraineeProfileResponse(
 
         String firstName,
