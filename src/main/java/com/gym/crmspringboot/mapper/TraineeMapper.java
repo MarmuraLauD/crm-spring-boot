@@ -7,9 +7,10 @@ import com.gym.crmspringboot.dto.response.TraineeProfileResponse;
 import com.gym.crmspringboot.model.Trainee;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring",
-        unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
         uses = TrainerMapper.class)
 public interface TraineeMapper {
 

@@ -7,8 +7,9 @@ import com.gym.crmspringboot.dto.response.TrainerProfileResponse;
 import com.gym.crmspringboot.model.Trainer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface TrainerMapper {
 
     @Mapping(target = "specialization.id", source = "specializationId")

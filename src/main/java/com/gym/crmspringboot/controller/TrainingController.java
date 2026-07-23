@@ -7,6 +7,7 @@ import com.gym.crmspringboot.dto.response.TrainerTrainingItemResponse;
 import com.gym.crmspringboot.dto.response.TrainingTypeItemResponse;
 import com.gym.crmspringboot.facade.GymFacade;
 import com.gym.crmspringboot.mapper.TrainingMapper;
+import com.gym.crmspringboot.mapper.TrainingTypeMapper;
 import com.gym.crmspringboot.model.Training;
 import com.gym.crmspringboot.model.TrainingType;
 import java.time.LocalDate;
@@ -30,6 +31,7 @@ public class TrainingController implements TrainingApi {
 
     private final GymFacade gymFacade;
     private final TrainingMapper trainingMapper;
+    private final TrainingTypeMapper trainingTypeMapper;
 
     @Override
     @GetMapping("/trainee/{username}")
@@ -93,7 +95,7 @@ public class TrainingController implements TrainingApi {
     public List<TrainingTypeItemResponse> getTrainingTypes() {
         List<TrainingType> types = gymFacade.getAllTrainingTypes();
         return types.stream()
-                .map(type -> new TrainingTypeItemResponse(type.getId(), type.getTrainingTypeName()))
+                .map(trainingTypeMapper::toItemResponse)
                 .toList();
     }
 

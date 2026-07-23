@@ -120,11 +120,10 @@ class TraineeServiceImplTest {
         when(traineeRepository.findByUsername(username)).thenReturn(Optional.of(trainee));
 
         // Act
-        Optional<Trainee> result = traineeService.findByUsername(username, password);
+        Trainee result = traineeService.findByUsername(username, password);
 
         // Assert
-        assertTrue(result.isPresent());
-        assertEquals(trainee, result.get());
+        assertEquals(trainee, result);
         verify(traineeRepository).findByUsername(username);
     }
 

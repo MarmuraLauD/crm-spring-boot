@@ -53,7 +53,6 @@ public class TrainingServiceImpl implements TrainingService {
         return trainingRepository.findAll(spec);
     }
 
-
     @RequireAuth
     @Transactional(readOnly = true)
     public List<Training> getTrainerTrainingsList(
