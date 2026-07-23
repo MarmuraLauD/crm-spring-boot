@@ -37,7 +37,7 @@ public class GymFacade {
         traineeService.deleteTrainee(username, password);
     }
 
-    public Optional<Trainee> getTraineeByUsername(String username, String password) {
+    public Trainee getTraineeByUsername(String username, String password) {
         return traineeService.findByUsername(username, password);
     }
 

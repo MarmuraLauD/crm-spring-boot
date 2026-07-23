@@ -2,6 +2,7 @@ package com.gym.crmspringboot.mapper;
 
 import com.gym.crmspringboot.dto.request.TraineeRegistrationRequest;
 import com.gym.crmspringboot.dto.request.UpdateTraineeRequest;
+import com.gym.crmspringboot.dto.response.RegistrationResponse;
 import com.gym.crmspringboot.dto.response.TraineeProfileResponse;
 import com.gym.crmspringboot.model.Trainee;
 import org.mapstruct.Mapper;
@@ -18,5 +19,7 @@ public interface TraineeMapper {
     Trainee toEntity(UpdateTraineeRequest request);
 
     TraineeProfileResponse toProfileResponse(Trainee trainee);
+
+    RegistrationResponse toRegistrationResponse(Trainee trainee);
 
 }

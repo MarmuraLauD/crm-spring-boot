@@ -44,18 +44,16 @@ public class TraineeController implements TraineeApi {
 
         Trainee createdTrainee = gymFacade.registerTrainee(trainee);
 
-        return new RegistrationResponse(createdTrainee.getUsername(), createdTrainee.getPassword());
+        return traineeMapper.toRegistrationResponse(createdTrainee);
     }
 
     @Override
     @GetMapping("/{username}")
-    @ResponseStatus(HttpStatus.OK)
     public TraineeProfileResponse getTraineeProfile(
             @PathVariable String username,
             @RequestParam String password) {
 
-        Trainee trainee = gymFacade.getTraineeByUsername(username, password)
-                .orElseThrow(() -> new IllegalArgumentException("Trainee not found."));
+        Trainee trainee = gymFacade.getTraineeByUsername(username, password);
         return traineeMapper.toProfileResponse(trainee);
     }
 

@@ -26,7 +26,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -95,7 +94,7 @@ class TraineeControllerTest {
                 List.of()
         );
 
-        when(gymFacade.getTraineeByUsername(username, password)).thenReturn(Optional.of(trainee));
+        when(gymFacade.getTraineeByUsername(username, password)).thenReturn(trainee);
         when(traineeMapper.toProfileResponse(trainee)).thenReturn(profileResponse);
 
         // Act & Assert

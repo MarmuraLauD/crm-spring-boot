@@ -71,9 +71,9 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @RequireAuth
     @Transactional(readOnly = true)
-    public Optional<Trainee> findByUsername(String username, String password) {
+    public Trainee findByUsername(String username, String password) {
         log.info("Finding trainee profile with username: {}", username);
-        return traineeRepository.findByUsername(username);
+        return traineeRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Trainee not found"));
     }
 
     @Override
