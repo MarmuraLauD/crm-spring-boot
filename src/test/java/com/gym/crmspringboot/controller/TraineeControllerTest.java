@@ -53,12 +53,12 @@ class TraineeControllerTest {
     @Test
     void registerTrainee_ShouldReturnCreatedStatusAndCredentials() throws Exception {
         // Arrange
-        TraineeRegistrationRequest request = new TraineeRegistrationRequest(
-                "John",
-                "Doe",
-                LocalDate.of(1990, Month.JANUARY, 1),
-                "123 Main St"
-        );
+        TraineeRegistrationRequest request = TraineeRegistrationRequest.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .dateOfBirth(LocalDate.of(1990, Month.JANUARY, 1))
+                .address("123 Main St")
+                .build();
         Trainee trainee = new Trainee();
         Trainee createdTrainee = new Trainee();
         createdTrainee.setUsername("John.Doe");
@@ -85,14 +85,14 @@ class TraineeControllerTest {
         String username = "John.Doe";
         String password = "password123";
         Trainee trainee = new Trainee();
-        TraineeProfileResponse profileResponse = new TraineeProfileResponse(
-                "John",
-                "Doe",
-                LocalDate.of(1990, Month.JANUARY, 1),
-                "123 Main St",
-                true,
-                List.of()
-        );
+        TraineeProfileResponse profileResponse = TraineeProfileResponse.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .dateOfBirth(LocalDate.of(1990, Month.JANUARY, 1))
+                .address("123 Main St")
+                .isActive(true)
+                .trainers(List.of())
+                .build();
 
         when(gymFacade.getTraineeByUsername(username, password)).thenReturn(trainee);
         when(traineeMapper.toProfileResponse(trainee)).thenReturn(profileResponse);
@@ -112,24 +112,23 @@ class TraineeControllerTest {
         // Arrange
         String username = "John.Doe";
         String password = "password123";
-        UpdateTraineeRequest request = new UpdateTraineeRequest(
-                username,
-                "John",
-                "Doe",
-                LocalDate.of(1990, Month.JANUARY, 1),
-                "123 Main St",
-                true
-        );
+        UpdateTraineeRequest request = UpdateTraineeRequest.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .dateOfBirth(LocalDate.of(1990, Month.JANUARY, 1))
+                .address("123 Main St")
+                .isActive(true)
+                .build();
         Trainee trainee = new Trainee();
         Trainee updatedTrainee = new Trainee();
-        TraineeProfileResponse profileResponse = new TraineeProfileResponse(
-                "John",
-                "Doe",
-                LocalDate.of(1990, Month.JANUARY, 1),
-                "123 Main St",
-                true,
-                List.of()
-        );
+        TraineeProfileResponse profileResponse = TraineeProfileResponse.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .dateOfBirth(LocalDate.of(1990, Month.JANUARY, 1))
+                .address("123 Main St")
+                .isActive(true)
+                .trainers(List.of())
+                .build();
 
         when(traineeMapper.toEntity(any(UpdateTraineeRequest.class))).thenReturn(trainee);
         when(gymFacade.updateTrainee(eq(username), eq(password), any(Trainee.class))).thenReturn(updatedTrainee);
@@ -172,18 +171,18 @@ class TraineeControllerTest {
         Trainer trainer2 = new Trainer();
         List<Trainer> updatedTrainers = Arrays.asList(trainer1, trainer2);
 
-        TrainerItemResponse itemResponse1 = new TrainerItemResponse(
-                username,
-                "John",
-                "Doe",
-                "CARDIO"
-        );
-        TrainerItemResponse itemResponse2 = new TrainerItemResponse(
-                "Trainer.Two",
-                "Jane",
-                "Smith",
-                "STRENGTH"
-        );
+        TrainerItemResponse itemResponse1 = TrainerItemResponse.builder()
+                .username("Trainer.One")
+                .firstName("John")
+                .lastName("Doe")
+                .specialization("CARDIO")
+                .build();
+        TrainerItemResponse itemResponse2 = TrainerItemResponse.builder()
+                .username("Trainer.Two")
+                .firstName("Jane")
+                .lastName("Smith")
+                .specialization("STRENGTH")
+                .build();
 
         when(gymFacade.updateTraineesTrainerList(eq(username), eq(password), ArgumentMatchers.any())).thenReturn(updatedTrainers);
         when(trainerMapper.toItemResponse(trainer1)).thenReturn(itemResponse1);

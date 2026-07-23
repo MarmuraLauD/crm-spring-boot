@@ -47,8 +47,7 @@ public class TrainerController implements TrainerApi {
             @PathVariable String username,
             @RequestParam String password) {
 
-        Trainer trainer = gymFacade.getTrainerByUsername(username, password)
-                .orElseThrow(() -> new IllegalArgumentException("Trainer not found."));
+        Trainer trainer = gymFacade.getTrainerByUsername(username, password);
         return trainerMapper.toProfileResponse(trainer);
     }
 

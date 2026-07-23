@@ -11,7 +11,6 @@ import com.gym.crmspringboot.service.TrainingTypeService;
 import com.gym.crmspringboot.service.UserService;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +64,7 @@ public class GymFacade {
         return trainerService.update(username, password, trainer);
     }
 
-    public Optional<Trainer> getTrainerByUsername(String username, String password) {
+    public Trainer getTrainerByUsername(String username, String password) {
         return trainerService.findByUsername(username, password);
     }
 

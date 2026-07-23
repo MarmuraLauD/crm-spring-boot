@@ -6,7 +6,6 @@ import com.gym.crmspringboot.service.TrainerService;
 import com.gym.crmspringboot.service.helper.CredentialsService;
 import com.gym.crmspringboot.service.security.RequireAuth;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,9 +51,10 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     @Transactional(readOnly = true)
     @RequireAuth
-    public Optional<Trainer> findByUsername(String username, String password) {
+    public Trainer findByUsername(String username, String password) {
         log.info("Finding trainer profile with username: {}", username);
-        return trainerRepository.findByUsername(username);
+        return trainerRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Trainer not found with username: " + username));
     }
 
     @Override

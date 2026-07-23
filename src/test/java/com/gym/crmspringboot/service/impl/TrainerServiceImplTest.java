@@ -80,11 +80,10 @@ class TrainerServiceImplTest {
         when(trainerRepository.findByUsername(username)).thenReturn(Optional.of(trainer));
 
         // Act
-        Optional<Trainer> result = trainerService.findByUsername(username, password);
+        Trainer result = trainerService.findByUsername(username, password);
 
         // Assert
-        assertTrue(result.isPresent());
-        assertEquals(trainer, result.get());
+        assertEquals(trainer, result);
         verify(trainerRepository).findByUsername(username);
     }
 

@@ -55,13 +55,13 @@ class TrainingControllerTest {
         Training training = new Training();
         List<Training> trainings = List.of(training);
 
-        TraineeTrainingItemResponse responseItem = new TraineeTrainingItemResponse(
-                "First Training",
-                LocalDate.of(2023, Month.JANUARY, 1),
-                "Cardio",
-                120.0,
-                "Joe"
-        );
+        TraineeTrainingItemResponse responseItem = TraineeTrainingItemResponse.builder()
+                .trainingName("First Training")
+                .trainingDate(LocalDate.of(2023, Month.JANUARY, 1))
+                .trainingType("Cardio")
+                .trainingDuration(120.0)
+                .trainerName("Joe")
+                .build();
 
         when(gymFacade.getTraineeTrainingsList(
                 eq(username), eq(password), eq(periodFrom), isNull(), isNull(), isNull()
@@ -93,13 +93,13 @@ class TrainingControllerTest {
         Training training = new Training();
         List<Training> trainings = List.of(training);
 
-        TrainerTrainingItemResponse responseItem = new TrainerTrainingItemResponse(
-                "Second Training",
-                LocalDate.of(2023, Month.JANUARY, 1),
-                "Yoga",
-                60.0,
-                "Jane"
-        );
+        TrainerTrainingItemResponse responseItem = TrainerTrainingItemResponse.builder()
+                .trainingName("Second Training")
+                .trainingDate(LocalDate.of(2023, Month.JANUARY, 1))
+                .trainingType("Yoga")
+                .trainingDuration(60.0)
+                .traineeName("Jane")
+                .build();
 
         when(gymFacade.getTrainerTrainingsList(
                 eq(username), eq(password), isNull(), eq(periodTo), isNull(), eq(trainingType)
@@ -126,13 +126,13 @@ class TrainingControllerTest {
         String username = "Admin.User";
         String password = "password123";
 
-        AddTrainingRequest request = new AddTrainingRequest(
-                "Joe.Doe",
-                "Jane.Doe",
-                "First Training",
-                LocalDate.of(2023, Month.JANUARY, 1),
-                120.0
-        );
+        AddTrainingRequest request = AddTrainingRequest.builder()
+                .traineeUsername("Joe.Doe")
+                .trainerUsername("Jane.Doe")
+                .trainingName("First Training")
+                .trainingDate(LocalDate.of(2023, Month.JANUARY, 1))
+                .trainingDuration(120.0)
+                .build();
         Training training = new Training();
 
         when(trainingMapper.toEntity(any(AddTrainingRequest.class))).thenReturn(training);

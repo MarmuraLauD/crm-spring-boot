@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -46,11 +45,11 @@ class TrainerControllerTest {
     void registerTrainer_ShouldReturnCreatedStatusAndCredentials() throws Exception {
         // Arrange
 
-        TrainerRegistrationRequest request = new TrainerRegistrationRequest(
-                "Jane",
-                "Smith",
-                2L
-        );
+        TrainerRegistrationRequest request = TrainerRegistrationRequest.builder()
+                .firstName("Jane")
+                .lastName("Smith")
+                .specializationId(2L)
+                .build();
         Trainer trainer = new Trainer();
         Trainer createdTrainer = new Trainer();
         createdTrainer.setUsername("Jane.Smith");
@@ -78,15 +77,14 @@ class TrainerControllerTest {
         String password = "password123";
         Trainer trainer = new Trainer();
 
-        TrainerProfileResponse profileResponse = new TrainerProfileResponse(
-                "Jane",
-                "Smith",
-                "STRENGTH",
-                true,
-                List.of()
-        );
+        TrainerProfileResponse profileResponse = TrainerProfileResponse.builder()
+                .firstName("Jane")
+                .lastName("Smith")
+                .specialization("CARDIO")
+                .isActive(true)
+                .build();
 
-        when(gymFacade.getTrainerByUsername(username, password)).thenReturn(Optional.of(trainer));
+        when(gymFacade.getTrainerByUsername(username, password)).thenReturn(trainer);
         when(trainerMapper.toProfileResponse(trainer)).thenReturn(profileResponse);
 
         // Act & Assert
@@ -105,24 +103,22 @@ class TrainerControllerTest {
         String username = "Jane.Smith";
         String password = "password123";
 
-        UpdateTrainerRequest request = new UpdateTrainerRequest(
-                username,
-                "Jane",
-                "Doe",
-                "CARDIO",
-                true
-        );
+        UpdateTrainerRequest request = UpdateTrainerRequest.builder()
+                .firstName("Jane")
+                .lastName("Doe")
+                .specialization("CARDIO")
+                .isActive(true)
+                .build();
         Trainer trainer = new Trainer();
         Trainer updatedTrainer = new Trainer();
 
         
-        TrainerProfileResponse profileResponse = new TrainerProfileResponse(
-                "Jane",
-                "Doe",
-                "CARDIO",
-                true,
-                List.of()
-        );
+        TrainerProfileResponse profileResponse = TrainerProfileResponse.builder()
+                .firstName("Jane")
+                .lastName("Doe")
+                .specialization("CARDIO")
+                .isActive(true)
+                .build();
 
         when(trainerMapper.toEntity(any(UpdateTrainerRequest.class))).thenReturn(trainer);
         when(gymFacade.updateTrainer(eq(username), eq(password), any(Trainer.class))).thenReturn(updatedTrainer);
@@ -152,18 +148,18 @@ class TrainerControllerTest {
         List<Trainer> unassignedTrainers = Arrays.asList(trainer1, trainer2);
 
         
-        TrainerItemResponse itemResponse1 = new TrainerItemResponse(
-                username,
-                "Jane",
-                "Doe",
-                "STRENGTH"
-        );
-        TrainerItemResponse itemResponse2 = new TrainerItemResponse(
-                username,
-                "Jane",
-                "Noes",
-                "CARDIO"
-        );
+        TrainerItemResponse itemResponse1 = TrainerItemResponse.builder()
+                .username(username)
+                .firstName("Jane")
+                .lastName("Doe")
+                .specialization("STRENGTH")
+                .build();
+        TrainerItemResponse itemResponse2 = TrainerItemResponse.builder()
+                .username(username)
+                .firstName("John")
+                .lastName("Doe")
+                .specialization("CARDIO")
+                .build();
 
         when(gymFacade.getUnassignedActiveTrainers(username, password, traineeUsername)).thenReturn(unassignedTrainers);
         when(trainerMapper.toItemResponse(trainer1)).thenReturn(itemResponse1);
