@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gym.crmspringboot.dto.request.TraineeRegistrationRequest;
 import com.gym.crmspringboot.dto.request.UpdateTraineeRequest;
+import com.gym.crmspringboot.dto.response.RegistrationResponse;
 import com.gym.crmspringboot.dto.response.TraineeProfileResponse;
 import com.gym.crmspringboot.dto.response.TrainerItemResponse;
 import com.gym.crmspringboot.facade.GymFacade;
@@ -64,8 +65,11 @@ class TraineeControllerTest {
         createdTrainee.setUsername("John.Doe");
         createdTrainee.setPassword("password123");
 
+        RegistrationResponse responseDto = new RegistrationResponse("John.Doe", "password123");
+
         when(traineeMapper.toEntity(any(TraineeRegistrationRequest.class))).thenReturn(trainee);
         when(gymFacade.registerTrainee(trainee)).thenReturn(createdTrainee);
+        when(traineeMapper.toRegistrationResponse(createdTrainee)).thenReturn(responseDto);
 
         // Act & Assert
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/trainees")

@@ -1,4 +1,4 @@
-package com.gym.crmspringboot.interceptor;
+package com.gym.crmspringboot.controller.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +17,7 @@ public class TransactionLoggingInterceptor implements HandlerInterceptor {
     private static final String START_TIME_ATTR = "startTime";
 
     @Override
-    public boolean preHandle(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         String transactionId = UUID.randomUUID().toString();
         MDC.put(TRANSACTION_ID, transactionId);
 
@@ -29,9 +29,14 @@ public class TransactionLoggingInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, @NonNull Object handler, Exception ex) {
-        long startTime = (long) request.getAttribute(START_TIME_ATTR);
-        long duration = System.currentTimeMillis() - startTime;
+    public void afterCompletion(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler, Exception ex) {
+        Object startTimeObj = request.getAttribute(START_TIME_ATTR);
+        long duration = 0;
+
+        if (startTimeObj != null) {
+            duration = System.currentTimeMillis() - (long) startTimeObj;
+        }
+
         int status = response.getStatus();
 
         log.info("Outgoing REST Response: METHOD=[{}], URI=[{}], STATUS=[{}], DURATION=[{}ms]",

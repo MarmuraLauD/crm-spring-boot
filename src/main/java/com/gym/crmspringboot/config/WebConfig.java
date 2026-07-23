@@ -1,6 +1,6 @@
 package com.gym.crmspringboot.config;
 
-import com.gym.crmspringboot.interceptor.TransactionLoggingInterceptor;
+import com.gym.crmspringboot.controller.interceptor.TransactionLoggingInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

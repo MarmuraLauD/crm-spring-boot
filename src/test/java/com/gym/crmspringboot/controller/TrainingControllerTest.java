@@ -5,8 +5,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gym.crmspringboot.dto.request.AddTrainingRequest;
 import com.gym.crmspringboot.dto.response.TraineeTrainingItemResponse;
 import com.gym.crmspringboot.dto.response.TrainerTrainingItemResponse;
+import com.gym.crmspringboot.dto.response.TrainingTypeItemResponse;
 import com.gym.crmspringboot.facade.GymFacade;
 import com.gym.crmspringboot.mapper.TrainingMapper;
+import com.gym.crmspringboot.mapper.TrainingTypeMapper;
 import com.gym.crmspringboot.model.Training;
 import com.gym.crmspringboot.model.TrainingType;
 import org.junit.jupiter.api.Test;
@@ -40,6 +42,9 @@ class TrainingControllerTest {
 
     @MockitoBean
     private GymFacade gymFacade;
+
+    @MockitoBean
+    private TrainingTypeMapper trainingTypeMapper;
 
     @MockitoBean
     private TrainingMapper trainingMapper;
@@ -161,7 +166,15 @@ class TrainingControllerTest {
         type2.setTrainingTypeName("Strength");
 
         List<TrainingType> types = Arrays.asList(type1, type2);
+        TrainingTypeItemResponse responseItem1 = TrainingTypeItemResponse.builder()
+                .trainingType("Cardio")
+                .build();
+        TrainingTypeItemResponse responseItem2 = TrainingTypeItemResponse.builder()
+                .trainingType("Strength")
+                .build();
 
+        when(trainingTypeMapper.toItemResponse(type1)).thenReturn(responseItem1);
+        when(trainingTypeMapper.toItemResponse(type2)).thenReturn(responseItem2);
         when(gymFacade.getAllTrainingTypes()).thenReturn(types);
 
         // Act & Assert
