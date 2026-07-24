@@ -1,0 +1,119 @@
+package com.gym.crmspringboot.facade;
+
+import com.gym.crmspringboot.model.Trainee;
+import com.gym.crmspringboot.model.Trainer;
+import com.gym.crmspringboot.model.Training;
+import com.gym.crmspringboot.model.TrainingType;
+import com.gym.crmspringboot.service.TraineeService;
+import com.gym.crmspringboot.service.TrainerService;
+import com.gym.crmspringboot.service.TrainingService;
+import com.gym.crmspringboot.service.TrainingTypeService;
+import com.gym.crmspringboot.service.UserService;
+import java.time.LocalDate;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class GymFacade {
+
+    private final TraineeService traineeService;
+    private final TrainerService trainerService;
+    private final TrainingService trainingService;
+    private final TrainingTypeService trainingTypeService;
+    private final UserService userService;
+
+    public Trainee registerTrainee(Trainee trainee) {
+        return traineeService.createTrainee(trainee);
+    }
+
+    public Trainee updateTrainee(String username, String password, Trainee trainee) {
+        return traineeService.updateTrainee(username, password, trainee);
+    }
+
+    public void deleteTrainee(String username, String password) {
+        traineeService.deleteTrainee(username, password);
+    }
+
+    public Trainee getTraineeByUsername(String username, String password) {
+        return traineeService.findByUsername(username, password);
+    }
+
+    public void changeUserPassword(String username, String oldPassword, String newPassword) {
+        userService.changePassword(username, oldPassword, newPassword);
+    }
+
+    public void toggleUserActive(String username, String password, Boolean status) {
+        userService.toggleActive(username, password, status);
+    }
+
+    public List<Trainer> updateTraineesTrainerList(
+            String username,
+            String password,
+            List<String> trainerUsernames
+    ) {
+        return traineeService.updateTrainersList(username, password, trainerUsernames);
+    }
+
+    public Trainer registerTrainer(Trainer trainer) {
+        return trainerService.create(trainer);
+    }
+
+    public Trainer updateTrainer(String username, String password, Trainer trainer) {
+        return trainerService.update(username, password, trainer);
+    }
+
+    public Trainer getTrainerByUsername(String username, String password) {
+        return trainerService.findByUsername(username, password);
+    }
+
+    public void createTraining(String username, String password, Training training) {
+        trainingService.create(username, password, training);
+    }
+
+    public List<Training> getTraineeTrainingsList(
+            String username,
+            String password,
+            LocalDate from,
+            LocalDate to,
+            String trainerName,
+            String trainingType
+    ) {
+        return trainingService.getTraineeTrainingsList(
+                username,
+                password,
+                from,
+                to,
+                trainerName,
+                trainingType
+        );
+    }
+
+    public List<Training> getTrainerTrainingsList(
+            String username,
+            String password,
+            LocalDate from,
+            LocalDate to,
+            String traineeName,
+            String trainingType
+    ) {
+        return trainingService.getTrainerTrainingsList(
+                username,
+                password,
+                from,
+                to,
+                traineeName,
+                trainingType
+        );
+    }
+
+    public List<TrainingType> getAllTrainingTypes() {
+        return trainingTypeService.getAllTrainingTypes();
+    }
+
+    public List<Trainer> getUnassignedActiveTrainers(String username, String password, String traineeUsername) {
+        return trainerService.getUnassignedActiveTrainers(username, password, traineeUsername);
+    }
+
+}

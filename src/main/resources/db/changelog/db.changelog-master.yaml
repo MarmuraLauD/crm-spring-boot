@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/tables/01-users.yaml
+  - include:
+      file: db/changelog/tables/02-training-types.yaml
+  - include:
+      file: db/changelog/tables/03-trainers.yaml
+  - include:
+      file: db/changelog/tables/04-trainees.yaml
+  - include:
+      file: db/changelog/tables/05-trainee-trainer.yaml
+  - include:
+      file: db/changelog/tables/06-trainings.yaml
+  - include:
+      file: db/changelog/tables/07-insert-training-types.yaml
