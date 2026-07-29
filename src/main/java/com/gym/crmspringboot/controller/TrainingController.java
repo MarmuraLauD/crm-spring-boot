@@ -14,14 +14,12 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -35,7 +33,6 @@ public class TrainingController implements TrainingApi {
 
     @Override
     @GetMapping("/trainee/{username}")
-    @ResponseStatus(HttpStatus.OK)
     public List<TraineeTrainingItemResponse> getTraineeTrainings(
             @PathVariable String username,
             @RequestParam String password,
@@ -58,7 +55,6 @@ public class TrainingController implements TrainingApi {
 
     @Override
     @GetMapping("/trainer/{username}")
-    @ResponseStatus(HttpStatus.OK)
     public List<TrainerTrainingItemResponse> getTrainerTrainings(
             @PathVariable String username,
             @RequestParam String password,
@@ -80,7 +76,6 @@ public class TrainingController implements TrainingApi {
 
     @Override
     @PostMapping
-    @ResponseStatus(HttpStatus.OK)
     public void addTraining(
             @RequestParam String username,
             @RequestParam String password,
@@ -91,7 +86,6 @@ public class TrainingController implements TrainingApi {
 
     @Override
     @GetMapping("/types")
-    @ResponseStatus(HttpStatus.OK)
     public List<TrainingTypeItemResponse> getTrainingTypes() {
         List<TrainingType> types = gymFacade.getAllTrainingTypes();
         return types.stream()

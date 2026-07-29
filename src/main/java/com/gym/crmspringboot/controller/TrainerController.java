@@ -42,7 +42,6 @@ public class TrainerController implements TrainerApi {
 
     @Override
     @GetMapping("/{username}")
-    @ResponseStatus(HttpStatus.OK)
     public TrainerProfileResponse getTrainerProfile(
             @PathVariable String username,
             @RequestParam String password) {
@@ -53,7 +52,6 @@ public class TrainerController implements TrainerApi {
 
     @Override
     @PutMapping("/{username}")
-    @ResponseStatus(HttpStatus.OK)
     public TrainerProfileResponse updateTrainerProfile(
             @PathVariable String username,
             @RequestParam String password,
@@ -66,7 +64,6 @@ public class TrainerController implements TrainerApi {
 
     @Override
     @GetMapping("/unassigned")
-    @ResponseStatus(HttpStatus.OK)
     public List<TrainerItemResponse> getUnassignedTrainers(
             @RequestParam String username,
             @RequestParam String password,

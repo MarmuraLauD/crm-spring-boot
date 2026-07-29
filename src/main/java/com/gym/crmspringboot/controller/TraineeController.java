@@ -59,7 +59,6 @@ public class TraineeController implements TraineeApi {
 
     @Override
     @PutMapping("/{username}")
-    @ResponseStatus(HttpStatus.OK)
     public TraineeProfileResponse updateTraineeProfile(
             @PathVariable String username,
             @RequestParam String password,
@@ -72,7 +71,6 @@ public class TraineeController implements TraineeApi {
 
     @Override
     @DeleteMapping("/{username}")
-    @ResponseStatus(HttpStatus.OK)
     public void deleteTraineeProfile(
             @PathVariable String username,
             @RequestParam String password) {
@@ -81,7 +79,6 @@ public class TraineeController implements TraineeApi {
 
     @Override
     @PutMapping("/{username}/trainers")
-    @ResponseStatus(HttpStatus.OK)
     public List<TrainerItemResponse> updateTraineeTrainers(
             @PathVariable String username,
             @RequestParam String password,
