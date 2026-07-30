@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://stg-db-server:5432/${STG_DB_NAME}
+    username: ${STG_DB_USER}
+    password: ${STG_DB_PASSWORD}
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    com.gym.crmspringboot: INFO

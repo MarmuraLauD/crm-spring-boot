@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://dev-db-server:5432/${DEV_DB_NAME}
+    username: ${DEV_DB_USER}
+    password: ${DEV_DB_PASSWORD}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    com.gym.crmspringboot: DEBUG
