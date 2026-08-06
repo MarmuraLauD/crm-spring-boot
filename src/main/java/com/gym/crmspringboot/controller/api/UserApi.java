@@ -20,5 +20,5 @@ public interface UserApi {
     @Operation(summary = "Toggle Account Status", description = "Activates or deactivates a user's account.")
     @ApiResponse(responseCode = "200", description = "Status updated successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
-    void toggleActive(String username, String password, Boolean status);
+    void toggleActive(String username, Boolean status);
 }

@@ -4,7 +4,6 @@ import com.gym.crmspringboot.model.Trainer;
 import com.gym.crmspringboot.repository.TrainerRepository;
 import com.gym.crmspringboot.service.TrainerService;
 import com.gym.crmspringboot.service.helper.CredentialsService;
-import com.gym.crmspringboot.service.security.RequireAuth;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,16 +41,14 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    @RequireAuth
-    public Trainer update(String username, String password, Trainer trainer) {
+    public Trainer update(Trainer trainer) {
         log.info("Updating trainer profile with username: {}", trainer.getUsername());
         return trainerRepository.save(trainer);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @RequireAuth
-    public Trainer findByUsername(String username, String password) {
+    public Trainer findByUsername(String username) {
         log.info("Finding trainer profile with username: {}", username);
         return trainerRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Trainer not found with username: " + username));
@@ -59,8 +56,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    @RequireAuth
-    public List<Trainer> getUnassignedActiveTrainers(String username, String password, String traineeUsername) {
+    public List<Trainer> getUnassignedActiveTrainers(String traineeUsername) {
         log.info("Getting unassigned active trainers for username: {}", traineeUsername);
         return trainerRepository.getUnassignedActiveTrainers(traineeUsername);
     }

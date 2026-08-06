@@ -43,32 +43,27 @@ public class TrainerController implements TrainerApi {
     @Override
     @GetMapping("/{username}")
     public TrainerProfileResponse getTrainerProfile(
-            @PathVariable String username,
-            @RequestParam String password) {
+            @PathVariable String username) {
 
-        Trainer trainer = gymFacade.getTrainerByUsername(username, password);
+        Trainer trainer = gymFacade.getTrainerByUsername(username);
         return trainerMapper.toProfileResponse(trainer);
     }
 
     @Override
     @PutMapping("/{username}")
     public TrainerProfileResponse updateTrainerProfile(
-            @PathVariable String username,
-            @RequestParam String password,
             @RequestBody UpdateTrainerRequest updateTrainerRequest) {
 
         Trainer trainer = trainerMapper.toEntity(updateTrainerRequest);
-        Trainer updatedTrainer = gymFacade.updateTrainer(username, password, trainer);
+        Trainer updatedTrainer = gymFacade.updateTrainer(trainer);
         return trainerMapper.toProfileResponse(updatedTrainer);
     }
 
     @Override
     @GetMapping("/unassigned")
     public List<TrainerItemResponse> getUnassignedTrainers(
-            @RequestParam String username,
-            @RequestParam String password,
             @RequestParam String traineeUsername) {
-        List<Trainer> unassignedTrainers = gymFacade.getUnassignedActiveTrainers(username, password, traineeUsername);
+        List<Trainer> unassignedTrainers = gymFacade.getUnassignedActiveTrainers(traineeUsername);
         return unassignedTrainers.stream()
                 .map(trainerMapper::toItemResponse)
                 .toList();
