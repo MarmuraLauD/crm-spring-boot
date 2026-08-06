@@ -42,6 +42,10 @@ dependencies {
     implementation 'jakarta.validation:jakarta.validation-api:4.0.0-M1'
     implementation 'org.springframework.boot:spring-boot-starter-actuator:4.1.0'
     implementation 'io.micrometer:micrometer-registry-prometheus:1.17.0'
+    implementation 'org.springframework.boot:spring-boot-starter-security:4.1.0'
+    implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.13.0'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.13.0'
 }
 
 tasks.named('test') {

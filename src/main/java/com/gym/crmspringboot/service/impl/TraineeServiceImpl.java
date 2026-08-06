@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class TraineeServiceImpl implements TraineeService {
     private final CredentialsService credentialsService;
     private final MeterRegistry meterRegistry;
     private AtomicInteger activeTraineesGauge;
+    private final PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void initMetrics() {
@@ -48,7 +50,7 @@ public class TraineeServiceImpl implements TraineeService {
                 trainee.getFirstName() + " " + trainee.getLastName());
 
         String password = credentialsService.generatePassword();
-        trainee.setPassword(password);
+        trainee.setPassword(passwordEncoder.encode(password));
 
         String username = credentialsService.generateUsername(
                 trainee.getFirstName(),
@@ -57,6 +59,7 @@ public class TraineeServiceImpl implements TraineeService {
         trainee.setUsername(username);
         trainee.setActive(true);
         Trainee savedTrainee = traineeRepository.save(trainee);
+        savedTrainee.setRawPassword(password);
         log.info("Trainee profile created with username: {}", savedTrainee.getUsername());
 
         if (activeTraineesGauge != null) {
