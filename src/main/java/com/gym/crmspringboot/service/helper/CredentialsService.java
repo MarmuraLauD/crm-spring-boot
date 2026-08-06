@@ -36,10 +36,4 @@ public class CredentialsService {
         return finalUsername;
     }
 
-    public boolean authenticate(String username, String rawPassword) {
-        return userRepository.findByUsername(username)
-                .map(user -> user.getPassword().equals(rawPassword))
-                .orElse(false);
-    }
-
 }

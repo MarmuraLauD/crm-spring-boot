@@ -7,6 +7,7 @@ import com.gym.crmspringboot.service.helper.CredentialsService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ public class TrainerServiceImpl implements TrainerService {
 
     private final TrainerRepository trainerRepository;
     private final CredentialsService credentialsService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -25,7 +27,7 @@ public class TrainerServiceImpl implements TrainerService {
                 trainer.getFirstName() + " " + trainer.getLastName());
 
         String password = credentialsService.generatePassword();
-        trainer.setPassword(password);
+        trainer.setPassword(passwordEncoder.encode(password));
 
         String username = credentialsService.generateUsername(
                 trainer.getFirstName(),
@@ -34,6 +36,7 @@ public class TrainerServiceImpl implements TrainerService {
         trainer.setUsername(username);
         trainer.setActive(true);
         Trainer savedTrainer = trainerRepository.save(trainer);
+        savedTrainer.setRawPassword(password);
         log.info("Trainer profile created with username: {}", savedTrainer.getUsername());
 
         return savedTrainer;

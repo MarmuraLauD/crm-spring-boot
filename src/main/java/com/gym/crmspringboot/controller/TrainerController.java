@@ -36,8 +36,10 @@ public class TrainerController implements TrainerApi {
     @ResponseStatus(HttpStatus.CREATED)
     public RegistrationResponse registerTrainer(@Valid @RequestBody TrainerRegistrationRequest request) {
         Trainer trainer = trainerMapper.toEntity(request);
+
         Trainer createdTrainer = gymFacade.registerTrainer(trainer);
-        return new RegistrationResponse(createdTrainer.getUsername(), createdTrainer.getPassword());
+
+        return trainerMapper.toRegistrationResponse(createdTrainer);
     }
 
     @Override
