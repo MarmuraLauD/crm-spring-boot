@@ -3,9 +3,6 @@ package com.gym.crmspringboot.facade;
 import com.gym.crmspringboot.model.Trainee;
 import com.gym.crmspringboot.model.Trainer;
 import com.gym.crmspringboot.service.TraineeService;
-import com.gym.crmspringboot.service.TrainerService;
-import com.gym.crmspringboot.service.TrainingService;
-import com.gym.crmspringboot.service.TrainingTypeService;
 import com.gym.crmspringboot.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,12 +21,6 @@ class GymFacadeTest {
 
     @Mock
     private TraineeService traineeService;
-    @Mock
-    private TrainerService trainerService;
-    @Mock
-    private TrainingService trainingService;
-    @Mock
-    private TrainingTypeService trainingTypeService;
     @Mock
     private UserService userService;
 

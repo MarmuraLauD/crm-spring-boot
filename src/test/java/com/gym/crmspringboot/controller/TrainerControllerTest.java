@@ -19,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -142,7 +141,7 @@ class TrainerControllerTest {
         // Arrange
         String traineeUsername = "Trainee.One";
         Trainer trainer = new Trainer();
-        List<Trainer> unassignedTrainers = Arrays.asList(trainer);
+        List<Trainer> unassignedTrainers = List.of(trainer);
 
         TrainerItemResponse itemResponse = TrainerItemResponse.builder()
                 .username("Trainer.Unassigned")

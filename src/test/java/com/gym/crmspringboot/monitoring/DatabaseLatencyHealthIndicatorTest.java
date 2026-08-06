@@ -45,6 +45,7 @@ class DatabaseLatencyHealthIndicatorTest {
         Health health = healthIndicator.health();
 
         // Assert
+        assert health != null;
         assertEquals(Status.DOWN, health.getStatus());
         assertEquals("Database connection failed", health.getDetails().get("error"));
     }

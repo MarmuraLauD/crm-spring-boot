@@ -3,7 +3,6 @@ package com.gym.crmspringboot.config;
 import com.gym.crmspringboot.security.CustomAccessDeniedHandler;
 import com.gym.crmspringboot.security.CustomAuthenticationEntryPoint;
 import com.gym.crmspringboot.security.JwtAuthenticationFilter;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
