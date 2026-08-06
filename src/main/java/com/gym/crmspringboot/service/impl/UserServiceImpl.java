@@ -2,7 +2,6 @@ package com.gym.crmspringboot.service.impl;
 
 import com.gym.crmspringboot.model.User;
 import com.gym.crmspringboot.repository.UserRepository;
-import com.gym.crmspringboot.service.security.RequireAuth;
 import com.gym.crmspringboot.service.UserService;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
@@ -18,7 +17,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    @RequireAuth
     @Transactional
     public void changePassword(String username, String oldPassword, String newPassword) {
         log.info("Changing password for user with username: {}", username);
@@ -35,9 +33,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @RequireAuth
     @Transactional
-    public void toggleActive(String username, String password, Boolean status) {
+    public void toggleActive(String username, Boolean status) {
         log.info("Toggling active status for user with username: {}", username);
 
         User user = userRepository.findByUsername(username).

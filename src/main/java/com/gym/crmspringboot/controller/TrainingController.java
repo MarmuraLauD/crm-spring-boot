@@ -35,14 +35,12 @@ public class TrainingController implements TrainingApi {
     @GetMapping("/trainee/{username}")
     public List<TraineeTrainingItemResponse> getTraineeTrainings(
             @PathVariable String username,
-            @RequestParam String password,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
             @RequestParam(required = false) String trainerName,
             @RequestParam(required = false) String trainingType) {
         List<Training> trainings = gymFacade.getTraineeTrainingsList(
                 username,
-                password,
                 periodFrom,
                 periodTo,
                 trainerName,
@@ -57,14 +55,12 @@ public class TrainingController implements TrainingApi {
     @GetMapping("/trainer/{username}")
     public List<TrainerTrainingItemResponse> getTrainerTrainings(
             @PathVariable String username,
-            @RequestParam String password,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodTo,
             @RequestParam(required = false) String traineeName,
             @RequestParam(required = false) String trainingType) {
         List<Training> trainings = gymFacade.getTrainerTrainingsList(
                 username,
-                password,
                 periodFrom,
                 periodTo,
                 traineeName,
@@ -77,11 +73,9 @@ public class TrainingController implements TrainingApi {
     @Override
     @PostMapping
     public void addTraining(
-            @RequestParam String username,
-            @RequestParam String password,
             @RequestBody AddTrainingRequest trainingDto) {
         Training training = trainingMapper.toEntity(trainingDto);
-        gymFacade.createTraining(username, password, training);
+        gymFacade.createTraining(training);
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.gym.crmspringboot.controller;
 
 import com.gym.crmspringboot.controller.api.UserApi;
 import com.gym.crmspringboot.facade.GymFacade;
-import com.gym.crmspringboot.service.security.RequireAuth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -21,7 +20,6 @@ public class UserController implements UserApi {
 
     @Override
     @GetMapping("/login")
-    @RequireAuth
     public void login(@RequestParam String username, @RequestParam String password) {
         // No further action is needed here; the aspect will handle authentication.
     }
@@ -38,9 +36,8 @@ public class UserController implements UserApi {
     @PatchMapping("/{username}/status")
     public void toggleActive(
             @PathVariable String username,
-            @RequestParam String password,
             @RequestParam Boolean status) {
-        gymFacade.toggleUserActive(username, password, status);
+        gymFacade.toggleUserActive(username, status);
     }
 
 }
