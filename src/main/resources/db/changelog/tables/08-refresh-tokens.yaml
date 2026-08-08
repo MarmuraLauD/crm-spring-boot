@@ -29,4 +29,4 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     foreignKeyName: fk_refresh_tokens_user
-                    references: users(id)
+                    references: users(user_id)

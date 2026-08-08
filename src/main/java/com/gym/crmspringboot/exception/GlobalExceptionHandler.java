@@ -66,4 +66,13 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler(LockedException.class)
+    @ResponseStatus(HttpStatus.LOCKED)
+    public ErrorResponse handleLockedException(LockedException ex) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.LOCKED.value())
+                .message(ex.getMessage())
+                .build();
+    }
+
 }

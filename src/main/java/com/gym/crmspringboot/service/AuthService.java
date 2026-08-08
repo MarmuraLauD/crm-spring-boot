@@ -6,7 +6,9 @@ import com.gym.crmspringboot.dto.response.JwtTokensDto;
 public interface AuthService {
 
     JwtTokensDto login(AuthRequest authRequest);
+
     JwtTokensDto refreshToken(String requestRefreshToken);
+
     void logout(String token);
 
 }
