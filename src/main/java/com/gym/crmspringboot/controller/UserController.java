@@ -3,7 +3,6 @@ package com.gym.crmspringboot.controller;
 import com.gym.crmspringboot.controller.api.UserApi;
 import com.gym.crmspringboot.facade.GymFacade;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,11 +17,6 @@ public class UserController implements UserApi {
 
     private final GymFacade gymFacade;
 
-    @Override
-    @GetMapping("/login")
-    public void login(@RequestParam String username, @RequestParam String password) {
-        // No further action is needed here; the aspect will handle authentication.
-    }
     @Override
     @PutMapping("/password")
     public void changePassword(

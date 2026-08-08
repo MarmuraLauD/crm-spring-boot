@@ -47,4 +47,23 @@ public class GlobalExceptionHandler {
                 .message("An unexpected error occurred")
                 .build();
     }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidTokenException(InvalidTokenException ex) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .message(ex.getMessage() != null ? ex.getMessage() : "Invalid or expired token")
+                .build();
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleUserNotFoundException(UserNotFoundException ex) {
+        return ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(ex.getMessage())
+                .build();
+    }
+
 }
