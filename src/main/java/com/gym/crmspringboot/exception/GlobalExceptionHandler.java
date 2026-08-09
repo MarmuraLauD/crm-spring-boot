@@ -4,6 +4,7 @@ import com.gym.crmspringboot.dto.response.ErrorResponse;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -73,6 +74,12 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.LOCKED.value())
                 .message(ex.getMessage())
                 .build();
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleBadCredentialsException(BadCredentialsException ex) {
+        return new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Invalid username or password");
     }
 
 }
