@@ -1,6 +1,9 @@
 package com.gym.crmspringboot.config;
 
+import com.gym.crmspringboot.security.CustomAccessDeniedHandler;
+import com.gym.crmspringboot.security.CustomAuthenticationEntryPoint;
 import com.gym.crmspringboot.security.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +43,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                        .accessDeniedHandler(new CustomAccessDeniedHandler())
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 HttpMethod.POST,
@@ -47,7 +54,7 @@ public class SecurityConfig {
                                 "/api/v1/trainers"
                         ).permitAll()
                         .requestMatchers(
-                                HttpMethod.GET,
+                                HttpMethod.POST,
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/refresh",
                                 "/api/v1/auth/logout"
