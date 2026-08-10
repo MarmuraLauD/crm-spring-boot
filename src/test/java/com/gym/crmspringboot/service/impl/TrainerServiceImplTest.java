@@ -58,13 +58,12 @@ class TrainerServiceImplTest {
     void update_ShouldSaveTrainer() {
         // Arrange
         String username = "Jane.Smith";
-        String password = "password123";
         Trainer trainer = new Trainer();
         trainer.setUsername(username);
         when(trainerRepository.save(trainer)).thenReturn(trainer);
 
         // Act
-        Trainer updatedTrainer = trainerService.update(username, password, trainer);
+        Trainer updatedTrainer = trainerService.update(trainer);
 
         // Assert
         assertEquals(trainer, updatedTrainer);
@@ -75,12 +74,11 @@ class TrainerServiceImplTest {
     void findByUsername_ShouldReturnOptionalTrainer() {
         // Arrange
         String username = "Jane.Smith";
-        String password = "password123";
         Trainer trainer = new Trainer();
         when(trainerRepository.findByUsername(username)).thenReturn(Optional.of(trainer));
 
         // Act
-        Trainer result = trainerService.findByUsername(username, password);
+        Trainer result = trainerService.findByUsername(username);
 
         // Assert
         assertEquals(trainer, result);
@@ -90,8 +88,6 @@ class TrainerServiceImplTest {
     @Test
     void getUnassignedActiveTrainers_ShouldReturnListOfTrainers() {
         // Arrange
-        String username = "Admin.User";
-        String password = "password123";
         String traineeUsername = "John.Doe";
 
         Trainer trainer1 = new Trainer();
@@ -103,7 +99,7 @@ class TrainerServiceImplTest {
         when(trainerRepository.getUnassignedActiveTrainers(traineeUsername)).thenReturn(expectedTrainers);
 
         // Act
-        List<Trainer> actualTrainers = trainerService.getUnassignedActiveTrainers(username, password, traineeUsername);
+        List<Trainer> actualTrainers = trainerService.getUnassignedActiveTrainers(traineeUsername);
 
         // Assert
         assertEquals(expectedTrainers.size(), actualTrainers.size());

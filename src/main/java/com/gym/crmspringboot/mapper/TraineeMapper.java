@@ -21,6 +21,7 @@ public interface TraineeMapper {
 
     TraineeProfileResponse toProfileResponse(Trainee trainee);
 
+    @Mapping(target = "password", source = "rawPassword")
     RegistrationResponse toRegistrationResponse(Trainee trainee);
 
 }

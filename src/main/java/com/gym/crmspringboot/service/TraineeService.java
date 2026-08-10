@@ -8,9 +8,9 @@ import java.util.List;
 public interface TraineeService {
 
     Trainee createTrainee(Trainee trainee);
-    Trainee updateTrainee(String username, String password, Trainee trainee);
-    void deleteTrainee(String username, String password);
-    Trainee findByUsername(String username, String password);
-    List<Trainer> updateTrainersList(String username, String password, List<String> trainerUsernames);
+    Trainee updateTrainee(Trainee trainee);
+    void deleteTrainee(String username);
+    Trainee findByUsername(String username);
+    List<Trainer> updateTrainersList(String username, List<String> trainerUsernames);
 
 }

@@ -28,53 +28,51 @@ public class GymFacade {
         return traineeService.createTrainee(trainee);
     }
 
-    public Trainee updateTrainee(String username, String password, Trainee trainee) {
-        return traineeService.updateTrainee(username, password, trainee);
+    public Trainee updateTrainee(Trainee trainee) {
+        return traineeService.updateTrainee(trainee);
     }
 
-    public void deleteTrainee(String username, String password) {
-        traineeService.deleteTrainee(username, password);
+    public void deleteTrainee(String username) {
+        traineeService.deleteTrainee(username);
     }
 
-    public Trainee getTraineeByUsername(String username, String password) {
-        return traineeService.findByUsername(username, password);
+    public Trainee getTraineeByUsername(String username) {
+        return traineeService.findByUsername(username);
     }
 
     public void changeUserPassword(String username, String oldPassword, String newPassword) {
         userService.changePassword(username, oldPassword, newPassword);
     }
 
-    public void toggleUserActive(String username, String password, Boolean status) {
-        userService.toggleActive(username, password, status);
+    public void toggleUserActive(String username, Boolean status) {
+        userService.toggleActive(username, status);
     }
 
     public List<Trainer> updateTraineesTrainerList(
             String username,
-            String password,
             List<String> trainerUsernames
     ) {
-        return traineeService.updateTrainersList(username, password, trainerUsernames);
+        return traineeService.updateTrainersList(username, trainerUsernames);
     }
 
     public Trainer registerTrainer(Trainer trainer) {
         return trainerService.create(trainer);
     }
 
-    public Trainer updateTrainer(String username, String password, Trainer trainer) {
-        return trainerService.update(username, password, trainer);
+    public Trainer updateTrainer(Trainer trainer) {
+        return trainerService.update(trainer);
     }
 
-    public Trainer getTrainerByUsername(String username, String password) {
-        return trainerService.findByUsername(username, password);
+    public Trainer getTrainerByUsername(String username) {
+        return trainerService.findByUsername(username);
     }
 
-    public void createTraining(String username, String password, Training training) {
-        trainingService.create(username, password, training);
+    public void createTraining(Training training) {
+        trainingService.create(training);
     }
 
     public List<Training> getTraineeTrainingsList(
             String username,
-            String password,
             LocalDate from,
             LocalDate to,
             String trainerName,
@@ -82,7 +80,6 @@ public class GymFacade {
     ) {
         return trainingService.getTraineeTrainingsList(
                 username,
-                password,
                 from,
                 to,
                 trainerName,
@@ -92,7 +89,6 @@ public class GymFacade {
 
     public List<Training> getTrainerTrainingsList(
             String username,
-            String password,
             LocalDate from,
             LocalDate to,
             String traineeName,
@@ -100,7 +96,6 @@ public class GymFacade {
     ) {
         return trainingService.getTrainerTrainingsList(
                 username,
-                password,
                 from,
                 to,
                 traineeName,
@@ -112,8 +107,8 @@ public class GymFacade {
         return trainingTypeService.getAllTrainingTypes();
     }
 
-    public List<Trainer> getUnassignedActiveTrainers(String username, String password, String traineeUsername) {
-        return trainerService.getUnassignedActiveTrainers(username, password, traineeUsername);
+    public List<Trainer> getUnassignedActiveTrainers(String username) {
+        return trainerService.getUnassignedActiveTrainers(username);
     }
 
 }

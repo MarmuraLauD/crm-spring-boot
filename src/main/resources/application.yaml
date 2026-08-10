@@ -1,22 +1,44 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/gym_crm
-    username: postgres
-    password: ${DB_PASSWORD}
-    driver: org.postgresql.Driver
-    pool:
-      size: 10
+  profiles:
+    active: local
 
-  hibernate:
-    dialect: org.hibernate.dialect.PostgreSQLDialect
-    show_sql: true
-    format_sql: true
-    hbm2ddl:
-      auto: validate
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
-  logging:
-    pattern:
-      console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [txn: %X{transactionId}] - %msg%n"
-    level:
-      com.gym.crmspringboot: INFO
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [txn: %X{transactionId}] - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: always
+  observations:
+    annotations:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 900000 # 15 minutes in milliseconds
+  refresh-expiration: 604800000 # 7 days in milliseconds

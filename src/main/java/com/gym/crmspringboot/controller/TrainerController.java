@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,44 +35,42 @@ public class TrainerController implements TrainerApi {
     @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('TRAINER')")
     public RegistrationResponse registerTrainer(@Valid @RequestBody TrainerRegistrationRequest request) {
         Trainer trainer = trainerMapper.toEntity(request);
+
         Trainer createdTrainer = gymFacade.registerTrainer(trainer);
-        return new RegistrationResponse(createdTrainer.getUsername(), createdTrainer.getPassword());
+
+        return trainerMapper.toRegistrationResponse(createdTrainer);
     }
 
     @Override
     @GetMapping("/{username}")
-    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('TRAINER')")
     public TrainerProfileResponse getTrainerProfile(
-            @PathVariable String username,
-            @RequestParam String password) {
+            @PathVariable String username) {
 
-        Trainer trainer = gymFacade.getTrainerByUsername(username, password);
+        Trainer trainer = gymFacade.getTrainerByUsername(username);
         return trainerMapper.toProfileResponse(trainer);
     }
 
     @Override
     @PutMapping("/{username}")
-    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('TRAINER')")
     public TrainerProfileResponse updateTrainerProfile(
-            @PathVariable String username,
-            @RequestParam String password,
             @RequestBody UpdateTrainerRequest updateTrainerRequest) {
 
         Trainer trainer = trainerMapper.toEntity(updateTrainerRequest);
-        Trainer updatedTrainer = gymFacade.updateTrainer(username, password, trainer);
+        Trainer updatedTrainer = gymFacade.updateTrainer(trainer);
         return trainerMapper.toProfileResponse(updatedTrainer);
     }
 
     @Override
     @GetMapping("/unassigned")
-    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('TRAINER')")
     public List<TrainerItemResponse> getUnassignedTrainers(
-            @RequestParam String username,
-            @RequestParam String password,
             @RequestParam String traineeUsername) {
-        List<Trainer> unassignedTrainers = gymFacade.getUnassignedActiveTrainers(username, password, traineeUsername);
+        List<Trainer> unassignedTrainers = gymFacade.getUnassignedActiveTrainers(traineeUsername);
         return unassignedTrainers.stream()
                 .map(trainerMapper::toItemResponse)
                 .toList();

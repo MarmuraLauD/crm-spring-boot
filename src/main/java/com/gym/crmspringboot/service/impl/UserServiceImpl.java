@@ -2,12 +2,12 @@ package com.gym.crmspringboot.service.impl;
 
 import com.gym.crmspringboot.model.User;
 import com.gym.crmspringboot.repository.UserRepository;
-import com.gym.crmspringboot.service.security.RequireAuth;
 import com.gym.crmspringboot.service.UserService;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -16,9 +16,9 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
-    @RequireAuth
     @Transactional
     public void changePassword(String username, String oldPassword, String newPassword) {
         log.info("Changing password for user with username: {}", username);
@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            user.setPassword(newPassword);
+            user.setPassword(passwordEncoder.encode(newPassword));
             log.info("Password changed successfully for user with username: {}", username);
         } else {
             log.warn("User not found with username: {}", username);
@@ -35,9 +35,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @RequireAuth
     @Transactional
-    public void toggleActive(String username, String password, Boolean status) {
+    public void toggleActive(String username, Boolean status) {
         log.info("Toggling active status for user with username: {}", username);
 
         User user = userRepository.findByUsername(username).

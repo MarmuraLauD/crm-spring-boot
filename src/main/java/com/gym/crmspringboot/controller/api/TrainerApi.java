@@ -23,16 +23,16 @@ public interface TrainerApi {
     @ApiResponse(responseCode = "200", description = "Profile retrieved successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @ApiResponse(responseCode = "404", description = "Trainer not found")
-    TrainerProfileResponse getTrainerProfile(String username, String password);
+    TrainerProfileResponse getTrainerProfile(String username);
 
     @Operation(summary = "Update Trainer Profile", description = "Updates an existing trainer's details.")
     @ApiResponse(responseCode = "200", description = "Profile updated successfully")
     @ApiResponse(responseCode = "400", description = "Validation failed")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
-    TrainerProfileResponse updateTrainerProfile(String username, String password, UpdateTrainerRequest updateTrainerRequest);
+    TrainerProfileResponse updateTrainerProfile(UpdateTrainerRequest updateTrainerRequest);
 
     @Operation(summary = "Get Unassigned Trainers", description = "Retrieves a list of active trainers not currently assigned to the specified trainee.")
     @ApiResponse(responseCode = "200", description = "List retrieved successfully")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
-    List<TrainerItemResponse> getUnassignedTrainers(String username, String password, String traineeUsername);
+    List<TrainerItemResponse> getUnassignedTrainers(String traineeUsername);
 }

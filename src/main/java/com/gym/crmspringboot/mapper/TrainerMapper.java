@@ -2,6 +2,7 @@ package com.gym.crmspringboot.mapper;
 
 import com.gym.crmspringboot.dto.request.TrainerRegistrationRequest;
 import com.gym.crmspringboot.dto.request.UpdateTrainerRequest;
+import com.gym.crmspringboot.dto.response.RegistrationResponse;
 import com.gym.crmspringboot.dto.response.TrainerItemResponse;
 import com.gym.crmspringboot.dto.response.TrainerProfileResponse;
 import com.gym.crmspringboot.model.Trainer;
@@ -24,5 +25,8 @@ public interface TrainerMapper {
 
     @Mapping(target = "specialization", source = "specialization.trainingTypeName")
     TrainerItemResponse toItemResponse(Trainer trainer);
+
+    @Mapping(target = "password", source = "rawPassword")
+    RegistrationResponse toRegistrationResponse(Trainer trainer);
 
 }
