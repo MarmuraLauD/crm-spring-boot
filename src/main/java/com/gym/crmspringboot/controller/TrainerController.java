@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +35,7 @@ public class TrainerController implements TrainerApi {
     @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('TRAINER')")
     public RegistrationResponse registerTrainer(@Valid @RequestBody TrainerRegistrationRequest request) {
         Trainer trainer = trainerMapper.toEntity(request);
 
@@ -44,6 +46,7 @@ public class TrainerController implements TrainerApi {
 
     @Override
     @GetMapping("/{username}")
+    @PreAuthorize("hasRole('TRAINER')")
     public TrainerProfileResponse getTrainerProfile(
             @PathVariable String username) {
 
@@ -53,6 +56,7 @@ public class TrainerController implements TrainerApi {
 
     @Override
     @PutMapping("/{username}")
+    @PreAuthorize("hasRole('TRAINER')")
     public TrainerProfileResponse updateTrainerProfile(
             @RequestBody UpdateTrainerRequest updateTrainerRequest) {
 
@@ -63,6 +67,7 @@ public class TrainerController implements TrainerApi {
 
     @Override
     @GetMapping("/unassigned")
+    @PreAuthorize("hasRole('TRAINER')")
     public List<TrainerItemResponse> getUnassignedTrainers(
             @RequestParam String traineeUsername) {
         List<Trainer> unassignedTrainers = gymFacade.getUnassignedActiveTrainers(traineeUsername);

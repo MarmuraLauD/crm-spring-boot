@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-role-to-users
+      author: system
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: role
+                  type: VARCHAR(50)
+                  defaultValue: 'ROLE_TRAINEE'
+                  constraints:
+                    nullable: false
