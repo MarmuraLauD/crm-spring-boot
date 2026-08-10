@@ -15,3 +15,5 @@ databaseChangeLog:
       file: db/changelog/tables/07-insert-training-types.yaml
   - include:
       file: db/changelog/tables/08-refresh-tokens.yaml
+  - include:
+      file: db/changelog/tables/09-add-roles.yaml

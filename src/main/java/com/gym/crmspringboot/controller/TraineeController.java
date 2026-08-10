@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,6 +49,7 @@ public class TraineeController implements TraineeApi {
 
     @Override
     @GetMapping("/{username}")
+    @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
     public TraineeProfileResponse getTraineeProfile(
             @PathVariable String username) {
 
@@ -57,6 +59,7 @@ public class TraineeController implements TraineeApi {
 
     @Override
     @PutMapping("/{username}")
+    @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
     public TraineeProfileResponse updateTraineeProfile(
             @RequestBody UpdateTraineeRequest updateTraineeRequest)
  {
@@ -67,6 +70,7 @@ public class TraineeController implements TraineeApi {
 
     @Override
     @DeleteMapping("/{username}")
+    @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
     public void deleteTraineeProfile(
             @PathVariable String username) {
         gymFacade.deleteTrainee(username);
@@ -74,6 +78,7 @@ public class TraineeController implements TraineeApi {
 
     @Override
     @PutMapping("/{username}/trainers")
+    @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
     public List<TrainerItemResponse> updateTraineeTrainers(
             @PathVariable String username,
             @RequestBody List<String> trainerUsernames) {

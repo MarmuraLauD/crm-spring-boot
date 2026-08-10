@@ -1,5 +1,6 @@
 package com.gym.crmspringboot.service.impl;
 
+import com.gym.crmspringboot.model.Role;
 import com.gym.crmspringboot.model.Trainer;
 import com.gym.crmspringboot.repository.TrainerRepository;
 import com.gym.crmspringboot.service.TrainerService;
@@ -35,6 +36,7 @@ public class TrainerServiceImpl implements TrainerService {
         );
         trainer.setUsername(username);
         trainer.setActive(true);
+        trainer.setRole(Role.ROLE_TRAINER);
         Trainer savedTrainer = trainerRepository.save(trainer);
         savedTrainer.setRawPassword(password);
         log.info("Trainer profile created with username: {}", savedTrainer.getUsername());
