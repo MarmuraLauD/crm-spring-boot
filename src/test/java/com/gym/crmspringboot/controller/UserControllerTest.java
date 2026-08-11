@@ -1,71 +1,66 @@
 package com.gym.crmspringboot.controller;
 
 import com.gym.crmspringboot.facade.GymFacade;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
+@ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @Mock
     private GymFacade gymFacade;
 
-    @Test
-    void login_ShouldReturnOkStatus() throws Exception {
-        // Arrange
-        String username = "John.Doe";
-        String password = "password123";
+    @InjectMocks
+    private UserController userController;
 
-        // Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/users/login")
-                        .param("username", username)
-                        .param("password", password))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        verifyNoInteractions(gymFacade);
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
     }
 
     @Test
-    void changePassword_ShouldReturnOkStatus() throws Exception {
+    void changePassword_ReturnsStatusOk() throws Exception {
         // Arrange
-        String username = "John.Doe";
-        String oldPassword = "oldPassword123";
-        String newPassword = "newPassword123";
+        String username = "user";
+        String oldPass = "old";
+        String newPass = "new";
 
-        // Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/users/password")
+        // Act
+        // Assert
+        mockMvc.perform(put("/api/v1/users/password")
                         .param("username", username)
-                        .param("oldPassword", oldPassword)
-                        .param("newPassword", newPassword))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                        .param("oldPassword", oldPass)
+                        .param("newPassword", newPass))
+                .andExpect(status().isOk());
 
-        verify(gymFacade).changeUserPassword(username, oldPassword, newPassword);
+        verify(gymFacade).changeUserPassword(username, oldPass, newPass);
     }
 
     @Test
-    void toggleActive_ShouldReturnOkStatus() throws Exception {
+    void toggleActive_ReturnsStatusOk() throws Exception {
         // Arrange
-        String username = "John.Doe";
-        String password = "password123";
+        String username = "user";
         Boolean status = true;
 
-        // Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/users/{username}/status", username)
-                        .param("password", password)
+        // Act
+        // Assert
+        mockMvc.perform(patch("/api/v1/users/{username}/status", username)
                         .param("status", status.toString()))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk());
 
-        verify(gymFacade).toggleUserActive(username, password, status);
+        verify(gymFacade).toggleUserActive(username, status);
     }
 }
