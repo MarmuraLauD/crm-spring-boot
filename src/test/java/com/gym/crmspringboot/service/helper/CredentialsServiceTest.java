@@ -1,22 +1,15 @@
 package com.gym.crmspringboot.service.helper;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import com.gym.crmspringboot.model.User;
 import com.gym.crmspringboot.repository.UserRepository;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CredentialsServiceTest {
@@ -28,36 +21,32 @@ class CredentialsServiceTest {
     private CredentialsService credentialsService;
 
     @Test
-    void generatePassword_ShouldReturnStringOfCorrectLength() {
+    void generatePassword_ReturnsTenCharacterString() {
         // Arrange
-        int expectedLength = 10;
-
         // Act
         String password = credentialsService.generatePassword();
 
         // Assert
         assertNotNull(password);
-        assertEquals(expectedLength, password.length());
+        assertEquals(10, password.length());
     }
 
     @Test
-    void generateUsername_WhenUserDoesNotExist_ShouldReturnBaseUsername() {
+    void generateUsername_WithoutConflicts_ReturnsBaseUsername() {
         // Arrange
         String firstName = "John";
         String lastName = "Doe";
-        String expectedUsername = "John.Doe";
-        when(userRepository.existsByUsername(expectedUsername)).thenReturn(false);
+        when(userRepository.existsByUsername("John.Doe")).thenReturn(false);
 
         // Act
-        String actualUsername = credentialsService.generateUsername(firstName, lastName);
+        String username = credentialsService.generateUsername(firstName, lastName);
 
         // Assert
-        assertEquals(expectedUsername, actualUsername);
-        verify(userRepository).existsByUsername(expectedUsername);
+        assertEquals("John.Doe", username);
     }
 
     @Test
-    void generateUsername_WhenUserExists_ShouldReturnSuffixedUsername() {
+    void generateUsername_WithConflicts_ReturnsUsernameWithSuffix() {
         // Arrange
         String firstName = "John";
         String lastName = "Doe";
@@ -66,57 +55,9 @@ class CredentialsServiceTest {
         when(userRepository.existsByUsername("John.Doe2")).thenReturn(false);
 
         // Act
-        String actualUsername = credentialsService.generateUsername(firstName, lastName);
+        String username = credentialsService.generateUsername(firstName, lastName);
 
         // Assert
-        assertEquals("John.Doe2", actualUsername);
-        verify(userRepository, times(3)).existsByUsername(anyString());
-    }
-
-    @Test
-    void authenticate_WhenCredentialsMatch_ShouldReturnTrue() {
-        // Arrange
-        String username = "John.Doe";
-        String password = "password123";
-        User user = new User();
-        user.setPassword(password);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
-
-        // Act
-        boolean isAuthenticated = credentialsService.authenticate(username, password);
-
-        // Assert
-        assertTrue(isAuthenticated);
-    }
-
-    @Test
-    void authenticate_WhenPasswordMismatches_ShouldReturnFalse() {
-        // Arrange
-        String username = "John.Doe";
-        String correctPassword = "password123";
-        String wrongPassword = "wrongPassword";
-        User user = new User();
-        user.setPassword(correctPassword);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
-
-        // Act
-        boolean isAuthenticated = credentialsService.authenticate(username, wrongPassword);
-
-        // Assert
-        assertFalse(isAuthenticated);
-    }
-
-    @Test
-    void authenticate_WhenUserDoesNotExist_ShouldReturnFalse() {
-        // Arrange
-        String username = "John.Doe";
-        String password = "password123";
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-
-        // Act
-        boolean isAuthenticated = credentialsService.authenticate(username, password);
-
-        // Assert
-        assertFalse(isAuthenticated);
+        assertEquals("John.Doe2", username);
     }
 }

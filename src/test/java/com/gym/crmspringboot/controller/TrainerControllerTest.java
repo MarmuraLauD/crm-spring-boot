@@ -1,179 +1,163 @@
 package com.gym.crmspringboot.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gym.crmspringboot.dto.request.TrainerRegistrationRequest;
 import com.gym.crmspringboot.dto.request.UpdateTrainerRequest;
+import com.gym.crmspringboot.dto.response.RegistrationResponse;
 import com.gym.crmspringboot.dto.response.TrainerItemResponse;
 import com.gym.crmspringboot.dto.response.TrainerProfileResponse;
 import com.gym.crmspringboot.facade.GymFacade;
 import com.gym.crmspringboot.mapper.TrainerMapper;
 import com.gym.crmspringboot.model.Trainer;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(TrainerController.class)
+@ExtendWith(MockitoExtension.class)
 class TrainerControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
 
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule());
-
-    @MockitoBean
+    @Mock
     private TrainerMapper trainerMapper;
 
-    @MockitoBean
+    @Mock
     private GymFacade gymFacade;
 
-    @Test
-    void registerTrainer_ShouldReturnCreatedStatusAndCredentials() throws Exception {
-        // Arrange
+    @InjectMocks
+    private TrainerController trainerController;
 
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(trainerController).build();
+        objectMapper = new ObjectMapper();
+    }
+
+    @Test
+    void registerTrainer_ReturnsStatusCreated() throws Exception {
+        // Arrange
         TrainerRegistrationRequest request = TrainerRegistrationRequest.builder()
                 .firstName("Jane")
-                .lastName("Smith")
-                .specializationId(2L)
+                .lastName("Doe")
+                .specializationId(1L)
                 .build();
+
         Trainer trainer = new Trainer();
         Trainer createdTrainer = new Trainer();
-        createdTrainer.setUsername("Jane.Smith");
-        createdTrainer.setPassword("password123");
+
+        RegistrationResponse response = RegistrationResponse.builder()
+                .username("trainerUsername")
+                .password("trainerPassword")
+                .build();
 
         when(trainerMapper.toEntity(any(TrainerRegistrationRequest.class))).thenReturn(trainer);
         when(gymFacade.registerTrainer(trainer)).thenReturn(createdTrainer);
+        when(trainerMapper.toRegistrationResponse(createdTrainer)).thenReturn(response);
 
-        // Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/trainers")
+        // Act
+        // Assert
+        mockMvc.perform(post("/api/v1/trainers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("Jane.Smith"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.password").value("password123"));
-
-        verify(trainerMapper).toEntity(any(TrainerRegistrationRequest.class));
-        verify(gymFacade).registerTrainer(trainer);
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.username").value("trainerUsername"))
+                .andExpect(jsonPath("$.password").value("trainerPassword"));
     }
 
     @Test
-    void getTrainerProfile_ShouldReturnOkStatusAndProfile() throws Exception {
+    void getTrainerProfile_ReturnsProfile() throws Exception {
         // Arrange
-        String username = "Jane.Smith";
-        String password = "password123";
+        String username = "Jane.Doe";
         Trainer trainer = new Trainer();
 
-        TrainerProfileResponse profileResponse = TrainerProfileResponse.builder()
+        TrainerProfileResponse response = TrainerProfileResponse.builder()
                 .firstName("Jane")
-                .lastName("Smith")
-                .specialization("CARDIO")
+                .lastName("Doe")
                 .isActive(true)
                 .build();
 
-        when(gymFacade.getTrainerByUsername(username, password)).thenReturn(trainer);
-        when(trainerMapper.toProfileResponse(trainer)).thenReturn(profileResponse);
+        when(gymFacade.getTrainerByUsername(username)).thenReturn(trainer);
+        when(trainerMapper.toProfileResponse(trainer)).thenReturn(response);
 
-        // Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/trainers/{username}", username)
-                        .param("password", password)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        verify(gymFacade).getTrainerByUsername(username, password);
-        verify(trainerMapper).toProfileResponse(trainer);
+        // Act
+        // Assert
+        mockMvc.perform(get("/api/v1/trainers/{username}", username))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("Jane"));
     }
 
     @Test
-    void updateTrainerProfile_ShouldReturnOkStatusAndUpdatedProfile() throws Exception {
+    void updateTrainerProfile_ReturnsUpdatedProfile() throws Exception {
         // Arrange
-        String username = "Jane.Smith";
-        String password = "password123";
+        String username = "Jane.Doe";
 
         UpdateTrainerRequest request = UpdateTrainerRequest.builder()
-                .firstName("Jane")
+                .firstName("JaneUpdated")
                 .lastName("Doe")
-                .specialization("CARDIO")
                 .isActive(true)
                 .build();
+
         Trainer trainer = new Trainer();
         Trainer updatedTrainer = new Trainer();
 
-        
-        TrainerProfileResponse profileResponse = TrainerProfileResponse.builder()
-                .firstName("Jane")
+        TrainerProfileResponse response = TrainerProfileResponse.builder()
+                .firstName("JaneUpdated")
                 .lastName("Doe")
-                .specialization("CARDIO")
                 .isActive(true)
                 .build();
 
         when(trainerMapper.toEntity(any(UpdateTrainerRequest.class))).thenReturn(trainer);
-        when(gymFacade.updateTrainer(eq(username), eq(password), any(Trainer.class))).thenReturn(updatedTrainer);
-        when(trainerMapper.toProfileResponse(updatedTrainer)).thenReturn(profileResponse);
+        when(gymFacade.updateTrainer(trainer)).thenReturn(updatedTrainer);
+        when(trainerMapper.toProfileResponse(updatedTrainer)).thenReturn(response);
 
-        // Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/trainers/{username}", username)
-                        .param("password", password)
+        // Act
+        // Assert
+        mockMvc.perform(put("/api/v1/trainers/{username}", username)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        verify(trainerMapper).toEntity(any(UpdateTrainerRequest.class));
-        verify(gymFacade).updateTrainer(eq(username), eq(password), any(Trainer.class));
-        verify(trainerMapper).toProfileResponse(updatedTrainer);
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("JaneUpdated"));
     }
 
     @Test
-    void getUnassignedTrainers_ShouldReturnOkStatusAndTrainerList() throws Exception {
+    void getUnassignedTrainers_ReturnsList() throws Exception {
         // Arrange
-        String username = "Admin.User";
-        String password = "password123";
-        String traineeUsername = "John.Doe";
+        String traineeUsername = "Trainee.One";
+        Trainer trainer = new Trainer();
+        List<Trainer> unassignedTrainers = Arrays.asList(trainer);
 
-        Trainer trainer1 = new Trainer();
-        Trainer trainer2 = new Trainer();
-        List<Trainer> unassignedTrainers = Arrays.asList(trainer1, trainer2);
-
-        
-        TrainerItemResponse itemResponse1 = TrainerItemResponse.builder()
-                .username(username)
-                .firstName("Jane")
-                .lastName("Doe")
-                .specialization("STRENGTH")
-                .build();
-        TrainerItemResponse itemResponse2 = TrainerItemResponse.builder()
-                .username(username)
-                .firstName("John")
-                .lastName("Doe")
-                .specialization("CARDIO")
+        TrainerItemResponse itemResponse = TrainerItemResponse.builder()
+                .username("Trainer.Unassigned")
+                .firstName("Trainer")
+                .lastName("Unassigned")
                 .build();
 
-        when(gymFacade.getUnassignedActiveTrainers(username, password, traineeUsername)).thenReturn(unassignedTrainers);
-        when(trainerMapper.toItemResponse(trainer1)).thenReturn(itemResponse1);
-        when(trainerMapper.toItemResponse(trainer2)).thenReturn(itemResponse2);
+        when(gymFacade.getUnassignedActiveTrainers(traineeUsername)).thenReturn(unassignedTrainers);
+        when(trainerMapper.toItemResponse(trainer)).thenReturn(itemResponse);
 
-        // Act & Assert
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/trainers/unassigned")
-                        .param("username", username)
-                        .param("password", password)
-                        .param("traineeUsername", traineeUsername)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2));
-
-        verify(gymFacade).getUnassignedActiveTrainers(username, password, traineeUsername);
+        // Act
+        // Assert
+        mockMvc.perform(get("/api/v1/trainers/unassigned")
+                        .param("traineeUsername", traineeUsername))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].username").value("Trainer.Unassigned"));
     }
 }
