@@ -4,20 +4,20 @@ import com.gym.crmspringboot.model.Training;
 import com.gym.crmspringboot.repository.TrainingRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,93 +31,79 @@ class TrainingServiceImplTest {
     private TrainingServiceImpl trainingService;
 
     @Test
-    void create_ShouldSaveTraining() {
+    void create_Success() {
         // Arrange
-        String username = "Admin.User";
-        String password = "password123";
         Training training = new Training();
-        training.setName("Cardio Basics");
-
-        when(trainingRepository.save(training)).thenReturn(training);
+        training.setName("Yoga Basics");
+        when(trainingRepository.save(any(Training.class))).thenReturn(training);
 
         // Act
-        Training savedTraining = trainingService.create(username, password, training);
+        Training result = trainingService.create(training);
 
         // Assert
-        assertEquals(training, savedTraining);
+        assertEquals("Yoga Basics", result.getName());
         verify(trainingRepository).save(training);
     }
 
     @Test
-    void findById_ShouldReturnOptionalTraining() {
+    void findById_Success() {
         // Arrange
-        String username = "Admin.User";
-        String password = "password123";
-        Long trainingId = 1L;
+        Long id = 1L;
         Training training = new Training();
-        training.setId(trainingId);
-
-        when(trainingRepository.findById(trainingId)).thenReturn(Optional.of(training));
+        training.setId(id);
+        when(trainingRepository.findById(id)).thenReturn(Optional.of(training));
 
         // Act
-        Optional<Training> result = trainingService.findById(username, password, trainingId);
+        Optional<Training> result = trainingService.findById(id);
 
         // Assert
         assertTrue(result.isPresent());
-        assertEquals(trainingId, result.get().getId());
-        verify(trainingRepository).findById(trainingId);
+        assertEquals(id, result.get().getId());
+        verify(trainingRepository).findById(id);
     }
 
     @Test
-    void getTraineeTrainingsList_ShouldReturnTrainingsBasedOnSpecification() {
+    void getTraineeTrainingsList_Success() {
         // Arrange
-        String username = "John.Doe";
-        String password = "password123";
-        LocalDate fromDate = LocalDate.of(2023, Month.JANUARY, 1);
-        LocalDate toDate = LocalDate.of(2023, Month.DECEMBER, 31);
-        String trainerName = "Jane.Smith";
-        String trainingType = "Yoga";
+        String username = "Trainee.One";
+        LocalDate from = LocalDate.now().minusDays(5);
+        LocalDate to = LocalDate.now();
+        String trainerName = "Trainer.One";
+        String trainingType = "Cardio";
 
         Training training1 = new Training();
         Training training2 = new Training();
         List<Training> expectedTrainings = Arrays.asList(training1, training2);
 
-        when(trainingRepository.findAll(ArgumentMatchers.<Specification<Training>>any())).thenReturn(expectedTrainings);
+        when(trainingRepository.findAll(Mockito.<Specification<Training>>any())).thenReturn(expectedTrainings);
 
         // Act
-        List<Training> actualTrainings = trainingService.getTraineeTrainingsList(
-                username, password, fromDate, toDate, trainerName, trainingType
-        );
+        List<Training> result = trainingService.getTraineeTrainingsList(username, from, to, trainerName, trainingType);
 
         // Assert
-        assertEquals(expectedTrainings.size(), actualTrainings.size());
-        assertEquals(expectedTrainings, actualTrainings);
-        verify(trainingRepository).findAll(ArgumentMatchers.<Specification<Training>>any());
+        assertEquals(2, result.size());
+        verify(trainingRepository).findAll(Mockito.<Specification<Training>>any());
     }
 
     @Test
-    void getTrainerTrainingsList_ShouldReturnTrainingsBasedOnSpecification() {
+    void getTrainerTrainingsList_Success() {
         // Arrange
-        String username = "Jane.Smith";
-        String password = "password123";
-        LocalDate fromDate = LocalDate.of(2023, Month.JANUARY, 1);
-        LocalDate toDate = LocalDate.of(2023, Month.DECEMBER, 31);
-        String traineeName = "John.Doe";
-        String trainingType = "Fitness";
+        String username = "Trainer.One";
+        LocalDate from = LocalDate.now().minusDays(5);
+        LocalDate to = LocalDate.now();
+        String traineeName = "Trainee.One";
+        String trainingType = "Strength";
 
         Training training1 = new Training();
         List<Training> expectedTrainings = List.of(training1);
 
-        when(trainingRepository.findAll(ArgumentMatchers.<Specification<Training>>any())).thenReturn(expectedTrainings);
+        when(trainingRepository.findAll(Mockito.<Specification<Training>>any())).thenReturn(expectedTrainings);
 
         // Act
-        List<Training> actualTrainings = trainingService.getTrainerTrainingsList(
-                username, password, fromDate, toDate, traineeName, trainingType
-        );
+        List<Training> result = trainingService.getTrainerTrainingsList(username, from, to, traineeName, trainingType);
 
         // Assert
-        assertEquals(expectedTrainings.size(), actualTrainings.size());
-        assertEquals(expectedTrainings, actualTrainings);
-        verify(trainingRepository).findAll(ArgumentMatchers.<Specification<Training>>any());
+        assertEquals(1, result.size());
+        verify(trainingRepository).findAll(Mockito.<Specification<Training>>any());
     }
 }

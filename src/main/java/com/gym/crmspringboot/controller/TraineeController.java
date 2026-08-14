@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,42 +49,41 @@ public class TraineeController implements TraineeApi {
 
     @Override
     @GetMapping("/{username}")
+    @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
     public TraineeProfileResponse getTraineeProfile(
-            @PathVariable String username,
-            @RequestParam String password) {
+            @PathVariable String username) {
 
-        Trainee trainee = gymFacade.getTraineeByUsername(username, password);
+        Trainee trainee = gymFacade.getTraineeByUsername(username);
         return traineeMapper.toProfileResponse(trainee);
     }
 
     @Override
     @PutMapping("/{username}")
+    @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
     public TraineeProfileResponse updateTraineeProfile(
-            @PathVariable String username,
-            @RequestParam String password,
             @RequestBody UpdateTraineeRequest updateTraineeRequest)
  {
         Trainee trainee = traineeMapper.toEntity(updateTraineeRequest);
-        Trainee updatedTrainee = gymFacade.updateTrainee(username, password, trainee);
+        Trainee updatedTrainee = gymFacade.updateTrainee(trainee);
         return traineeMapper.toProfileResponse(updatedTrainee);
     }
 
     @Override
     @DeleteMapping("/{username}")
+    @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
     public void deleteTraineeProfile(
-            @PathVariable String username,
-            @RequestParam String password) {
-        gymFacade.deleteTrainee(username, password);
+            @PathVariable String username) {
+        gymFacade.deleteTrainee(username);
     }
 
     @Override
     @PutMapping("/{username}/trainers")
+    @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
     public List<TrainerItemResponse> updateTraineeTrainers(
             @PathVariable String username,
-            @RequestParam String password,
             @RequestBody List<String> trainerUsernames) {
         List<Trainer> updatedTrainers = gymFacade
-                .updateTraineesTrainerList(username, password, trainerUsernames);
+                .updateTraineesTrainerList(username, trainerUsernames);
         return updatedTrainers.stream()
                 .map(trainerMapper::toItemResponse)
                 .toList();

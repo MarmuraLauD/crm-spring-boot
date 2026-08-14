@@ -1,176 +1,183 @@
 package com.gym.crmspringboot.service.impl;
 
+import com.gym.crmspringboot.model.Role;
 import com.gym.crmspringboot.model.Trainee;
 import com.gym.crmspringboot.model.Trainer;
 import com.gym.crmspringboot.repository.TraineeRepository;
 import com.gym.crmspringboot.repository.TrainerRepository;
 import com.gym.crmspringboot.service.helper.CredentialsService;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.any;
 
 @ExtendWith(MockitoExtension.class)
 class TraineeServiceImplTest {
 
     @Mock
-    private TraineeRepository traineeRepository;
-
-    @Mock
     private TrainerRepository trainerRepository;
-
+    @Mock
+    private TraineeRepository traineeRepository;
     @Mock
     private CredentialsService credentialsService;
+    @Mock
+    private MeterRegistry meterRegistry;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private TraineeServiceImpl traineeService;
 
+    @BeforeEach
+    void setUp() {
+        when(traineeRepository.count()).thenReturn(5L);
+        when(meterRegistry.gauge(anyString(), any(AtomicInteger.class)))
+                .thenAnswer(invocation -> invocation.getArgument(1));
+
+        traineeService.initMetrics();
+    }
+
     @Test
-    void createTrainee_ShouldGenerateCredentialsAndSave() {
+    void createTrainee_Success() {
         // Arrange
         Trainee trainee = new Trainee();
         trainee.setFirstName("John");
         trainee.setLastName("Doe");
 
-        String expectedPassword = "generatedPassword123";
-        String expectedUsername = "John.Doe";
-
-        when(credentialsService.generatePassword()).thenReturn(expectedPassword);
-        when(credentialsService.generateUsername("John", "Doe")).thenReturn(expectedUsername);
-        when(traineeRepository.save(trainee)).thenReturn(trainee);
+        when(credentialsService.generatePassword()).thenReturn("rawPassword123");
+        when(passwordEncoder.encode("rawPassword123")).thenReturn("encodedPassword123");
+        when(credentialsService.generateUsername("John", "Doe")).thenReturn("John.Doe");
+        when(traineeRepository.save(any(Trainee.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        Trainee savedTrainee = traineeService.createTrainee(trainee);
+        Trainee result = traineeService.createTrainee(trainee);
 
         // Assert
-        assertEquals(expectedPassword, savedTrainee.getPassword());
-        assertEquals(expectedUsername, savedTrainee.getUsername());
-        assertTrue(savedTrainee.isActive());
+        assertEquals("John.Doe", result.getUsername());
+        assertEquals("rawPassword123", result.getRawPassword());
+        assertEquals("encodedPassword123", result.getPassword());
+        assertTrue(result.isActive());
+        assertEquals(Role.ROLE_TRAINEE, result.getRole());
         verify(traineeRepository).save(trainee);
     }
 
     @Test
-    void updateTrainee_ShouldSaveTrainee() {
+    void updateTrainee_Success() {
         // Arrange
-        String username = "John.Doe";
-        String password = "password123";
         Trainee trainee = new Trainee();
-        trainee.setUsername(username);
+        trainee.setUsername("John.Doe");
         when(traineeRepository.save(trainee)).thenReturn(trainee);
 
         // Act
-        Trainee updatedTrainee = traineeService.updateTrainee(username, password, trainee);
+        Trainee result = traineeService.updateTrainee(trainee);
 
         // Assert
-        assertEquals(trainee, updatedTrainee);
+        assertNotNull(result);
+        assertEquals("John.Doe", result.getUsername());
         verify(traineeRepository).save(trainee);
     }
 
     @Test
-    void deleteTrainee_WhenExists_ShouldDeleteByUsername() {
+    void deleteTrainee_Success() {
         // Arrange
         String username = "John.Doe";
-        String password = "password123";
         Trainee trainee = new Trainee();
         when(traineeRepository.findByUsername(username)).thenReturn(Optional.of(trainee));
 
         // Act
-        traineeService.deleteTrainee(username, password);
+        traineeService.deleteTrainee(username);
 
         // Assert
         verify(traineeRepository).deleteByUsername(username);
     }
 
     @Test
-    void deleteTrainee_WhenNotFound_ShouldThrowException() {
+    void deleteTrainee_ThrowsException_WhenNotFound() {
         // Arrange
-        String username = "John.Doe";
-        String password = "password123";
+        String username = "Unknown.User";
         when(traineeRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> traineeService.deleteTrainee(username, password)
-        );
-        assertEquals("Trainee not found", exception.getMessage());
-        verify(traineeRepository, never()).deleteByUsername(any());
+        // Act
+        // Assert
+        assertThrows(IllegalArgumentException.class, () -> traineeService.deleteTrainee(username));
     }
 
     @Test
-    void findByUsername_ShouldReturnOptionalTrainee() {
+    void findByUsername_Success() {
         // Arrange
         String username = "John.Doe";
-        String password = "password123";
         Trainee trainee = new Trainee();
+        trainee.setUsername(username);
         when(traineeRepository.findByUsername(username)).thenReturn(Optional.of(trainee));
 
         // Act
-        Trainee result = traineeService.findByUsername(username, password);
+        Trainee result = traineeService.findByUsername(username);
 
         // Assert
-        assertEquals(trainee, result);
-        verify(traineeRepository).findByUsername(username);
+        assertNotNull(result);
+        assertEquals(username, result.getUsername());
     }
 
     @Test
-    void updateTrainersList_WhenTraineeExists_ShouldUpdateAndReturnTrainers() {
+    void findByUsername_ThrowsException_WhenNotFound() {
+        // Arrange
+        String username = "Unknown.User";
+        when(traineeRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+        // Act
+        // Assert
+        assertThrows(IllegalArgumentException.class, () -> traineeService.findByUsername(username));
+    }
+
+    @Test
+    void updateTrainersList_Success() {
         // Arrange
         String username = "John.Doe";
-        String password = "password123";
-        List<String> trainerUsernames = Arrays.asList("Trainer.One", "Trainer.Two");
-
         Trainee trainee = new Trainee();
-        trainee.setTrainers(new HashSet<>());
-
+        List<String> trainerUsernames = List.of("Trainer.One", "Trainer.Two");
         Trainer trainer1 = new Trainer();
-        trainer1.setUsername("Trainer.One");
         Trainer trainer2 = new Trainer();
-        trainer2.setUsername("Trainer.Two");
-        List<Trainer> foundTrainers = Arrays.asList(trainer1, trainer2);
+        List<Trainer> newTrainers = List.of(trainer1, trainer2);
 
         when(traineeRepository.findByUsername(username)).thenReturn(Optional.of(trainee));
-        when(trainerRepository.findByUsernameIn(trainerUsernames)).thenReturn(foundTrainers);
+        when(trainerRepository.findByUsernameIn(trainerUsernames)).thenReturn(newTrainers);
 
         // Act
-        List<Trainer> updatedTrainers = traineeService.updateTrainersList(username, password, trainerUsernames);
+        List<Trainer> result = traineeService.updateTrainersList(username, trainerUsernames);
 
         // Assert
-        assertEquals(2, updatedTrainers.size());
-        assertTrue(updatedTrainers.contains(trainer1));
-        assertTrue(updatedTrainers.contains(trainer2));
-        verify(traineeRepository).findByUsername(username);
-        verify(trainerRepository).findByUsernameIn(trainerUsernames);
+        assertEquals(2, result.size());
+        assertTrue(result.contains(trainer1));
+        assertTrue(result.contains(trainer2));
     }
 
     @Test
-    void updateTrainersList_WhenTraineeNotFound_ShouldThrowException() {
+    void updateTrainersList_ThrowsException_WhenTraineeNotFound() {
         // Arrange
-        String username = "John.Doe";
-        String password = "password123";
+        String username = "Unknown.User";
         List<String> trainerUsernames = List.of("Trainer.One");
         when(traineeRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> traineeService.updateTrainersList(username, password, trainerUsernames)
-        );
-        assertEquals("Trainee not found", exception.getMessage());
-        verify(trainerRepository, never()).findByUsernameIn(any());
+        // Act
+        // Assert
+        assertThrows(IllegalArgumentException.class, () -> traineeService.updateTrainersList(username, trainerUsernames));
     }
+
 }

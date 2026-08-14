@@ -1,12 +1,12 @@
 package com.gym.crmspringboot.service.impl;
 
+import com.gym.crmspringboot.model.Role;
 import com.gym.crmspringboot.model.Trainee;
 import com.gym.crmspringboot.model.Trainer;
 import com.gym.crmspringboot.repository.TraineeRepository;
 import com.gym.crmspringboot.repository.TrainerRepository;
 import com.gym.crmspringboot.service.TraineeService;
 import com.gym.crmspringboot.service.helper.CredentialsService;
-import com.gym.crmspringboot.service.security.RequireAuth;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.PostConstruct;
@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ public class TraineeServiceImpl implements TraineeService {
     private final CredentialsService credentialsService;
     private final MeterRegistry meterRegistry;
     private AtomicInteger activeTraineesGauge;
+    private final PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void initMetrics() {
@@ -49,7 +51,7 @@ public class TraineeServiceImpl implements TraineeService {
                 trainee.getFirstName() + " " + trainee.getLastName());
 
         String password = credentialsService.generatePassword();
-        trainee.setPassword(password);
+        trainee.setPassword(passwordEncoder.encode(password));
 
         String username = credentialsService.generateUsername(
                 trainee.getFirstName(),
@@ -57,7 +59,9 @@ public class TraineeServiceImpl implements TraineeService {
         );
         trainee.setUsername(username);
         trainee.setActive(true);
+        trainee.setRole(Role.ROLE_TRAINEE);
         Trainee savedTrainee = traineeRepository.save(trainee);
+        savedTrainee.setRawPassword(password);
         log.info("Trainee profile created with username: {}", savedTrainee.getUsername());
 
         if (activeTraineesGauge != null) {
@@ -68,19 +72,17 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    @RequireAuth
     @Transactional
     @Timed(value = "trainee_service.update.time", description = "Time taken to update trainee")
-    public Trainee updateTrainee(String username, String password, Trainee trainee) {
+    public Trainee updateTrainee(Trainee trainee) {
         log.info("Updating trainee profile with username: {}", trainee.getUsername());
         return traineeRepository.save(trainee);
     }
 
     @Override
-    @RequireAuth
     @Transactional
     @Timed(value = "trainee_service.delete.time", description = "Time taken to delete trainee")
-    public void deleteTrainee(String username, String password) {
+    public void deleteTrainee(String username) {
         log.info("Deleting trainee profile with username: {}", username);
         Optional<Trainee> traineeOpt = traineeRepository.findByUsername(username);
 
@@ -97,19 +99,17 @@ public class TraineeServiceImpl implements TraineeService {
     }
 
     @Override
-    @RequireAuth
     @Transactional(readOnly = true)
     @Timed(value = "trainee_service.find.time", description = "Time taken to find trainee")
-    public Trainee findByUsername(String username, String password) {
+    public Trainee findByUsername(String username) {
         log.info("Finding trainee profile with username: {}", username);
         return traineeRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Trainee not found"));
     }
 
     @Override
-    @RequireAuth
     @Transactional
     @Timed(value = "trainee_service.update_trainers.time", description = "Time taken to update trainee's trainer list")
-    public List<Trainer> updateTrainersList(String username, String password, List<String> trainerUsernames) {
+    public List<Trainer> updateTrainersList(String username, List<String> trainerUsernames) {
         Trainee trainee = traineeRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Trainee not found"));
 

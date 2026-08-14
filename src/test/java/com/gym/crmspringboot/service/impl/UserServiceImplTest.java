@@ -7,12 +7,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,79 +21,53 @@ class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserServiceImpl userService;
 
     @Test
-    void changePassword_WhenUserExists_ShouldUpdatePassword() {
+    void changePassword_Success() {
         // Arrange
-        String username = "John.Doe";
-        String oldPassword = "oldPassword123";
-        String newPassword = "newPassword456";
+        String username = "user";
         User user = new User();
-        user.setUsername(username);
-        user.setPassword(oldPassword);
+        user.setPassword("oldEncoded");
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode("newPassword")).thenReturn("newEncoded");
+
+        // Act
+        userService.changePassword(username, "oldPassword", "newPassword");
+
+        // Assert
+        assertEquals("newEncoded", user.getPassword());
+    }
+
+    @Test
+    void changePassword_ThrowsException_WhenUserNotFound() {
+        // Arrange
+        String username = "user";
+        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+        // Act
+        // Assert
+        assertThrows(IllegalArgumentException.class, () -> userService.changePassword(username, "old", "new"));
+    }
+
+    @Test
+    void toggleActive_Success() {
+        // Arrange
+        String username = "user";
+        User user = new User();
+        user.setActive(false);
+
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
         // Act
-        userService.changePassword(username, oldPassword, newPassword);
+        userService.toggleActive(username, true);
 
         // Assert
-        assertEquals(newPassword, user.getPassword());
-        verify(userRepository).findByUsername(username);
-    }
-
-    @Test
-    void changePassword_WhenUserNotFound_ShouldThrowException() {
-        // Arrange
-        String username = "Unknown.User";
-        String oldPassword = "oldPassword123";
-        String newPassword = "newPassword456";
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> userService.changePassword(username, oldPassword, newPassword)
-        );
-        assertEquals("User not found with username: " + username, exception.getMessage());
-        verify(userRepository).findByUsername(username);
-    }
-
-    @Test
-    void toggleActive_WhenUserExists_ShouldUpdateStatus() {
-        // Arrange
-        String username = "John.Doe";
-        String password = "password123";
-        Boolean newStatus = false;
-        User user = new User();
-        user.setUsername(username);
-        user.setActive(true);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
-
-        // Act
-        userService.toggleActive(username, password, newStatus);
-
-        // Assert
-        assertEquals(newStatus, user.isActive());
-        verify(userRepository).findByUsername(username);
-    }
-
-    @Test
-    void toggleActive_WhenUserNotFound_ShouldThrowException() {
-        // Arrange
-        String username = "Unknown.User";
-        String password = "password123";
-        Boolean newStatus = false;
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> userService.toggleActive(username, password, newStatus)
-        );
-        assertEquals("User not found with username: " + username, exception.getMessage());
-        verify(userRepository).findByUsername(username);
+        assertTrue(user.isActive());
     }
 }

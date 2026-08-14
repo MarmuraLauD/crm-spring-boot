@@ -38,3 +38,12 @@ management:
     distribution:
       percentiles-histogram:
         "[http.server.requests]": true
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 900000 # 15 minutes in milliseconds
+  refresh-expiration: 604800000 # 7 days in milliseconds
+
+app:
+  admin:
+    username: ${ADMIN_USERNAME}
+    password: ${ADMIN_PASSWORD}
