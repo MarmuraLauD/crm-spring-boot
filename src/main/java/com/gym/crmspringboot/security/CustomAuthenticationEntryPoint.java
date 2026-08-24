@@ -1,8 +1,9 @@
 package com.gym.crmspringboot.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.gym.crmspringboot.dto.response.ErrorResponse;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull AuthenticationException authException
-    ) throws IOException, ServletException {
+    ) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
@@ -31,6 +32,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         );
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         response.getWriter().write(mapper.writeValueAsString(errorResponse));
     }
 }

@@ -31,11 +31,13 @@ public class AdminInitializer implements CommandLineRunner {
     public void run(String @NonNull ... args) {
         if (userRepository.findByUsername(adminUsername).isEmpty()) {
 
-            User admin = new User();
-            admin.setUsername(adminUsername);
-            admin.setPassword(passwordEncoder.encode(adminPassword));
-            admin.setRole(Role.ROLE_ADMIN);
-
+            User admin = User.builder()
+                    .firstName("Super")
+                    .lastName("Admin")
+                    .role(Role.ROLE_ADMIN)
+                    .password(passwordEncoder.encode(adminPassword))
+                    .username(adminUsername)
+                    .build();
             userRepository.save(admin);
 
             log.info("Super admin created successfully with username: {}", adminUsername);
