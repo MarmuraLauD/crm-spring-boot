@@ -135,4 +135,6 @@ class TrainingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].trainingType").value("Strength"));
     }
+
+
 }
