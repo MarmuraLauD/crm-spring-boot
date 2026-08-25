@@ -10,6 +10,7 @@ import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,6 +30,7 @@ public class Trainer extends User {
     @JoinColumn(name = "specialization_id")
     private TrainingType specialization;
 
+    @Builder.Default
     @ManyToMany(mappedBy = "trainers", fetch = FetchType.LAZY)
     private Set<Trainee> trainees = new HashSet<>();
 
