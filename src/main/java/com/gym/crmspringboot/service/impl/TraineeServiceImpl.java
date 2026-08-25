@@ -1,10 +1,15 @@
 package com.gym.crmspringboot.service.impl;
 
+import com.gym.crmspringboot.client.TrainerWorkloadClient;
+import com.gym.crmspringboot.dto.ActionType;
+import com.gym.crmspringboot.dto.request.WorkloadRequest;
+import com.gym.crmspringboot.exception.UserNotFoundException;
 import com.gym.crmspringboot.model.Role;
 import com.gym.crmspringboot.model.Trainee;
 import com.gym.crmspringboot.model.Trainer;
 import com.gym.crmspringboot.repository.TraineeRepository;
 import com.gym.crmspringboot.repository.TrainerRepository;
+import com.gym.crmspringboot.security.util.SecurityUtils;
 import com.gym.crmspringboot.service.TraineeService;
 import com.gym.crmspringboot.service.helper.CredentialsService;
 import io.micrometer.core.annotation.Timed;
@@ -13,7 +18,6 @@ import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +36,7 @@ public class TraineeServiceImpl implements TraineeService {
     private final MeterRegistry meterRegistry;
     private AtomicInteger activeTraineesGauge;
     private final PasswordEncoder passwordEncoder;
+    private final TrainerWorkloadClient workloadClient;
 
     @PostConstruct
     public void initMetrics() {
@@ -84,17 +89,30 @@ public class TraineeServiceImpl implements TraineeService {
     @Timed(value = "trainee_service.delete.time", description = "Time taken to delete trainee")
     public void deleteTrainee(String username) {
         log.info("Deleting trainee profile with username: {}", username);
-        Optional<Trainee> traineeOpt = traineeRepository.findByUsername(username);
+        Trainee trainee = traineeRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Trainee not found"));
 
-        if (traineeOpt.isPresent()) {
-            traineeRepository.deleteByUsername(username);
+        String token = SecurityUtils.extractAuthToken();
 
-            if (activeTraineesGauge != null) {
-                activeTraineesGauge.decrementAndGet();
-            }
+        if (trainee.getTrainings() != null) {
+            trainee.getTrainings().forEach(training -> {
+                WorkloadRequest request = WorkloadRequest.builder()
+                        .trainerUsername(training.getTrainer().getUsername())
+                        .trainerFirstName(training.getTrainer().getFirstName())
+                        .trainerLastName(training.getTrainer().getLastName())
+                        .isActive(training.getTrainer().isActive())
+                        .trainingDate(training.getTrainingDate())
+                        .trainingDuration(training.getTrainingDuration().intValue())
+                        .actionType(ActionType.DELETE)
+                        .build();
+                workloadClient.updateWorkload(request, token);
+            });
+        }
 
-        } else {
-            throw new IllegalArgumentException("Trainee not found");
+        traineeRepository.deleteByUsername(username);
+
+        if (activeTraineesGauge != null) {
+            activeTraineesGauge.decrementAndGet();
         }
     }
 
@@ -103,7 +121,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Timed(value = "trainee_service.find.time", description = "Time taken to find trainee")
     public Trainee findByUsername(String username) {
         log.info("Finding trainee profile with username: {}", username);
-        return traineeRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Trainee not found"));
+        return traineeRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Trainee not found"));
     }
 
     @Override
@@ -111,7 +129,7 @@ public class TraineeServiceImpl implements TraineeService {
     @Timed(value = "trainee_service.update_trainers.time", description = "Time taken to update trainee's trainer list")
     public List<Trainer> updateTrainersList(String username, List<String> trainerUsernames) {
         Trainee trainee = traineeRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("Trainee not found"));
+                .orElseThrow(() -> new UserNotFoundException("Trainee not found"));
 
         List<Trainer> newTrainers = trainerRepository.findByUsernameIn(trainerUsernames);
 
