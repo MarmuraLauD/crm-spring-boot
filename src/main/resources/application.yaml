@@ -58,3 +58,21 @@ eureka:
   instance:
     hostname: localhost
     prefer-ip-address: true
+
+server:
+  port: 8083
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      workloadService:
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+        minimumNumberOfCalls: 3
+  timelimiter:
+    instances:
+      workloadService:
+        timeoutDuration: 3s
+        cancelRunningFuture: true
