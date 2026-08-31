@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpHeaders;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.cloud.client.ServiceInstance;
@@ -21,9 +22,11 @@ public class TrainerWorkloadClient {
 
     private final RestClient restClient;
     private final DiscoveryClient discoveryClient;
+    private final JmsTemplate jmsTemplate;
 
-    public TrainerWorkloadClient(RestClient.Builder builder, DiscoveryClient discoveryClient) {
+    public TrainerWorkloadClient(RestClient.Builder builder, DiscoveryClient discoveryClient, JmsTemplate jmsTemplate) {
         this.discoveryClient = discoveryClient;
+        this.jmsTemplate = jmsTemplate;
         this.restClient = builder
                 .requestInterceptor((request, body, execution) -> {
                     String transactionId = MDC.get("transactionId");
@@ -45,15 +48,15 @@ public class TrainerWorkloadClient {
                 .orElseThrow(() -> new IllegalStateException("No active instances found for TRAINER-WORKLOAD-SERVICE"));
     }
 
-    @CircuitBreaker(name = "workloadService", fallbackMethod = "updateWorkloadFallback")
     public void updateWorkload(WorkloadRequest workloadRequest, String token) {
-        String baseUrl = getServiceUri();
-        restClient.post()
-                .uri(baseUrl + "/api/v1/workloads")
-                .header(HttpHeaders.AUTHORIZATION, token)
-                .body(workloadRequest)
-                .retrieve()
-                .toBodilessEntity();
+        jmsTemplate.convertAndSend("workload.queue", workloadRequest, message -> {
+            message.setStringProperty("Authorization", token);
+            String transactionId = MDC.get("transactionId");
+            if (transactionId != null) {
+                message.setStringProperty("X-Transaction-Id", transactionId);
+            }
+            return message;
+        });
     }
 
     @CircuitBreaker(name = "workloadService", fallbackMethod = "getTrainerWorkloadFallback")
@@ -66,10 +69,6 @@ public class TrainerWorkloadClient {
                 .body(TrainerWorkloadResponse.class);
     }
 
-    public void updateWorkloadFallback(WorkloadRequest workloadRequest, String token, Throwable throwable) {
-        log.error("Failed to update workload for trainer {}. Error: {}", workloadRequest.getTrainerUsername(), throwable.getMessage());
-    }
-
     public TrainerWorkloadResponse getTrainerWorkloadFallback(String username, String token, Throwable throwable) {
         log.error("Failed to fetch workload for trainer {}. Returning empty summary. Error: {}", username, throwable.getMessage());
 
@@ -79,4 +78,5 @@ public class TrainerWorkloadClient {
 
         return fallbackResponse;
     }
+
 }

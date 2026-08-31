@@ -8,11 +8,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.client.RestClient;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,12 +34,14 @@ class TrainerWorkloadClientTest {
 
     private TrainerWorkloadClient client;
 
+    private JmsTemplate jmsTemplate;
+
     @BeforeEach
     void setUp() {
         when(restClientBuilder.requestInterceptor(any())).thenReturn(restClientBuilder);
         when(restClientBuilder.build()).thenReturn(restClient);
 
-        client = new TrainerWorkloadClient(restClientBuilder, discoveryClient);
+        client = new TrainerWorkloadClient(restClientBuilder, discoveryClient, jmsTemplate);
     }
 
     @Test
@@ -51,18 +53,6 @@ class TrainerWorkloadClientTest {
         // Act
         // Assert
         assertThrows(IllegalStateException.class, () -> client.updateWorkload(request, "Bearer token"));
-    }
-
-    @Test
-    void updateWorkloadFallback_ExecutesWithoutExceptions() {
-        // Arrange
-        WorkloadRequest request = new WorkloadRequest();
-        request.setTrainerUsername("Trainer.One");
-        Throwable exception = new RuntimeException("Test Exception");
-
-        // Act
-        // Assert
-        assertDoesNotThrow(() -> client.updateWorkloadFallback(request, "Bearer token", exception));
     }
 
     @Test

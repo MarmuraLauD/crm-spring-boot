@@ -53,6 +53,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
     implementation 'org.springframework.boot:spring-boot-starter-aop:4.0.0-M2'
+    implementation 'org.springframework.boot:spring-boot-starter-activemq:4.2.0-M1'
 
 }
 
