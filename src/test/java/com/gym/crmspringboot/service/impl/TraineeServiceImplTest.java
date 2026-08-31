@@ -1,20 +1,30 @@
 package com.gym.crmspringboot.service.impl;
 
+import com.gym.crmspringboot.client.TrainerWorkloadClient;
+import com.gym.crmspringboot.dto.ActionType;
+import com.gym.crmspringboot.dto.request.WorkloadRequest;
+import com.gym.crmspringboot.exception.UserNotFoundException;
 import com.gym.crmspringboot.model.Role;
 import com.gym.crmspringboot.model.Trainee;
 import com.gym.crmspringboot.model.Trainer;
+import com.gym.crmspringboot.model.Training;
 import com.gym.crmspringboot.repository.TraineeRepository;
 import com.gym.crmspringboot.repository.TrainerRepository;
+import com.gym.crmspringboot.security.util.SecurityUtils;
 import com.gym.crmspringboot.service.helper.CredentialsService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,6 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +53,8 @@ class TraineeServiceImplTest {
     private MeterRegistry meterRegistry;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private TrainerWorkloadClient workloadClient;
 
     @InjectMocks
     private TraineeServiceImpl traineeService;
@@ -99,13 +113,36 @@ class TraineeServiceImplTest {
         // Arrange
         String username = "John.Doe";
         Trainee trainee = new Trainee();
+        trainee.setUsername(username);
+
+        Trainer trainer = new Trainer();
+        trainer.setUsername("Trainer.One");
+        trainer.setFirstName("Jane");
+        trainer.setLastName("Smith");
+        trainer.setActive(true);
+
+        Training training = new Training();
+        training.setTrainer(trainer);
+        training.setTrainingDate(LocalDate.now());
+        training.setTrainingDuration(45.0);
+
+        trainee.setTrainings(List.of(training));
+
         when(traineeRepository.findByUsername(username)).thenReturn(Optional.of(trainee));
 
-        // Act
-        traineeService.deleteTrainee(username);
+        try (MockedStatic<SecurityUtils> mockedSecurityUtils = Mockito.mockStatic(SecurityUtils.class)) {
+            mockedSecurityUtils.when(SecurityUtils::extractAuthToken).thenReturn("Bearer token");
 
-        // Assert
-        verify(traineeRepository).deleteByUsername(username);
+            // Act
+            traineeService.deleteTrainee(username);
+
+            // Assert
+            verify(traineeRepository).deleteByUsername(username);
+
+            ArgumentCaptor<WorkloadRequest> requestCaptor = ArgumentCaptor.forClass(WorkloadRequest.class);
+            verify(workloadClient, times(1)).updateWorkload(requestCaptor.capture(), eq("Bearer token"));
+            assertEquals(ActionType.DELETE, requestCaptor.getValue().getActionType());
+        }
     }
 
     @Test
@@ -116,7 +153,7 @@ class TraineeServiceImplTest {
 
         // Act
         // Assert
-        assertThrows(IllegalArgumentException.class, () -> traineeService.deleteTrainee(username));
+        assertThrows(UserNotFoundException.class, () -> traineeService.deleteTrainee(username));
     }
 
     @Test
@@ -143,7 +180,7 @@ class TraineeServiceImplTest {
 
         // Act
         // Assert
-        assertThrows(IllegalArgumentException.class, () -> traineeService.findByUsername(username));
+        assertThrows(UserNotFoundException.class, () -> traineeService.findByUsername(username));
     }
 
     @Test
@@ -177,7 +214,7 @@ class TraineeServiceImplTest {
 
         // Act
         // Assert
-        assertThrows(IllegalArgumentException.class, () -> traineeService.updateTrainersList(username, trainerUsernames));
+        assertThrows(UserNotFoundException.class, () -> traineeService.updateTrainersList(username, trainerUsernames));
     }
 
 }

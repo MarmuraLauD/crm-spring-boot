@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,6 +36,7 @@ public class Trainee extends User{
     @Column(name = "address")
     private String address;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "trainee_trainer",
@@ -43,6 +45,7 @@ public class Trainee extends User{
     )
     private Set<Trainer> trainers = new HashSet<>();
 
+    @Builder.Default
     @OneToMany(
             mappedBy = "trainee",
             cascade = jakarta.persistence.CascadeType.ALL

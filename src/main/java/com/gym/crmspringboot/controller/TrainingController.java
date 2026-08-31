@@ -78,8 +78,7 @@ public class TrainingController implements TrainingApi {
     @PreAuthorize("hasRole('TRAINER')")
     public void addTraining(
             @RequestBody AddTrainingRequest trainingDto) {
-        Training training = trainingMapper.toEntity(trainingDto);
-        gymFacade.createTraining(training);
+        gymFacade.createTraining(trainingDto);
     }
 
     @Override

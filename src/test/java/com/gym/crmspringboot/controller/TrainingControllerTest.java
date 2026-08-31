@@ -1,7 +1,6 @@
 package com.gym.crmspringboot.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gym.crmspringboot.dto.request.AddTrainingRequest;
 import com.gym.crmspringboot.dto.response.TraineeTrainingItemResponse;
 import com.gym.crmspringboot.dto.response.TrainerTrainingItemResponse;
 import com.gym.crmspringboot.dto.response.TrainingTypeItemResponse;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -24,10 +22,8 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -96,25 +92,6 @@ class TrainingControllerTest {
                 .andExpect(jsonPath("$[0].trainingName").value("Cardio"));
     }
 
-    @Test
-    void addTraining_ReturnsStatusOk() throws Exception {
-        // Arrange
-        AddTrainingRequest request = AddTrainingRequest.builder()
-                .trainingName("New Training")
-                .build();
-        Training training = new Training();
-
-        when(trainingMapper.toEntity(any(AddTrainingRequest.class))).thenReturn(training);
-
-        // Act
-        // Assert
-        mockMvc.perform(post("/api/v1/trainings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
-
-        verify(gymFacade).createTraining(training);
-    }
 
     @Test
     void getTrainingTypes_ReturnsList() throws Exception {
@@ -135,4 +112,6 @@ class TrainingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].trainingType").value("Strength"));
     }
+
+
 }

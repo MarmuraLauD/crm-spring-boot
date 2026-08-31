@@ -23,5 +23,6 @@ public interface TrainingService {
             String traineeName,
             String trainingType
     );
+    void delete(Long id);
 
 }
