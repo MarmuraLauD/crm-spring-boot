@@ -13,6 +13,11 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
+  activemq:
+    broker-url: tcp://localhost:61616
+    user: ${MQ_ADMIN_USERNAME}
+    password: ${MQ_ADMIN_PASSWORD}
+
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
@@ -48,8 +53,8 @@ jwt:
 
 app:
   admin:
-    username: ${ADMIN_USERNAME}
-    password: ${ADMIN_PASSWORD}
+    username: ${APP_ADMIN_USERNAME}
+    password: ${APP_ADMIN_PASSWORD}
 
 eureka:
   client:
