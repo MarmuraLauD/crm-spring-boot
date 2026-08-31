@@ -13,11 +13,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WorkloadRequest {
+
     private String trainerUsername;
     private String trainerFirstName;
     private String trainerLastName;
-    private boolean isActive;
+    private Boolean isActive;
     private LocalDate trainingDate;
     private int trainingDuration;
     private ActionType actionType;
+
 }

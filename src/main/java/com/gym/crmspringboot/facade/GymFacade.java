@@ -1,5 +1,7 @@
 package com.gym.crmspringboot.facade;
 
+import com.gym.crmspringboot.dto.request.AddTrainingRequest;
+import com.gym.crmspringboot.mapper.TrainingMapper;
 import com.gym.crmspringboot.model.Trainee;
 import com.gym.crmspringboot.model.Trainer;
 import com.gym.crmspringboot.model.Training;
@@ -23,6 +25,7 @@ public class GymFacade {
     private final TrainingService trainingService;
     private final TrainingTypeService trainingTypeService;
     private final UserService userService;
+    private final TrainingMapper trainingMapper;
 
     public Trainee registerTrainee(Trainee trainee) {
         return traineeService.createTrainee(trainee);
@@ -67,7 +70,10 @@ public class GymFacade {
         return trainerService.findByUsername(username);
     }
 
-    public void createTraining(Training training) {
+    public void createTraining(AddTrainingRequest trainingDto) {
+        Trainee trainee = traineeService.findByUsername(trainingDto.traineeUsername());
+        Trainer trainer = trainerService.findByUsername(trainingDto.trainerUsername());
+        Training training = trainingMapper.toEntity(trainingDto, trainee, trainer);
         trainingService.create(training);
     }
 
