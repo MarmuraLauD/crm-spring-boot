@@ -58,7 +58,7 @@ public class TraineeController implements TraineeApi {
     @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
     public TraineeProfileResponse updateTraineeProfile(
             @PathVariable String username,
-            @RequestBody UpdateTraineeRequest updateTraineeRequest)
+            @RequestBody @Valid UpdateTraineeRequest updateTraineeRequest)
  {
         Trainee updatedTrainee = gymFacade.updateTrainee(username, updateTraineeRequest);
         return traineeMapper.toProfileResponse(updatedTrainee);
