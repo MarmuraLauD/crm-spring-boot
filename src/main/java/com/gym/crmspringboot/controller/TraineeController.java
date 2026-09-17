@@ -15,7 +15,6 @@ import com.gym.crmspringboot.model.Trainer;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -38,12 +36,10 @@ public class TraineeController implements TraineeApi {
 
     @Override
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public RegistrationResponse registerTrainee(@Valid @RequestBody TraineeRegistrationRequest request) {
+
         Trainee trainee = traineeMapper.toEntity(request);
-
         Trainee createdTrainee = gymFacade.registerTrainee(trainee);
-
         return traineeMapper.toRegistrationResponse(createdTrainee);
     }
 
@@ -61,10 +57,10 @@ public class TraineeController implements TraineeApi {
     @PutMapping("/{username}")
     @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
     public TraineeProfileResponse updateTraineeProfile(
+            @PathVariable String username,
             @RequestBody UpdateTraineeRequest updateTraineeRequest)
  {
-        Trainee trainee = traineeMapper.toEntity(updateTraineeRequest);
-        Trainee updatedTrainee = gymFacade.updateTrainee(trainee);
+        Trainee updatedTrainee = gymFacade.updateTrainee(username, updateTraineeRequest);
         return traineeMapper.toProfileResponse(updatedTrainee);
     }
 

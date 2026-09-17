@@ -1,5 +1,8 @@
 package com.gym.crmspringboot.service.impl;
 
+import com.gym.crmspringboot.dto.request.UpdateTrainerRequest;
+import com.gym.crmspringboot.exception.UserNotFoundException;
+import com.gym.crmspringboot.mapper.TrainerMapper;
 import com.gym.crmspringboot.model.Role;
 import com.gym.crmspringboot.model.Trainer;
 import com.gym.crmspringboot.repository.TrainerRepository;
@@ -20,6 +23,7 @@ public class TrainerServiceImpl implements TrainerService {
     private final TrainerRepository trainerRepository;
     private final CredentialsService credentialsService;
     private final PasswordEncoder passwordEncoder;
+    private final TrainerMapper trainerMapper;
 
     @Override
     @Transactional
@@ -46,9 +50,15 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     @Transactional
-    public Trainer update(Trainer trainer) {
-        log.info("Updating trainer profile with username: {}", trainer.getUsername());
-        return trainerRepository.save(trainer);
+    public Trainer update(String username, UpdateTrainerRequest request) {
+        log.info("Updating trainer profile with username: {}", username);
+
+        Trainer existingTrainer = trainerRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Trainer not found with username: " + username));
+
+        trainerMapper.updateTrainerFromRequest(request, existingTrainer);
+
+        return trainerRepository.save(existingTrainer);
     }
 
     @Override
@@ -56,7 +66,7 @@ public class TrainerServiceImpl implements TrainerService {
     public Trainer findByUsername(String username) {
         log.info("Finding trainer profile with username: {}", username);
         return trainerRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("Trainer not found with username: " + username));
+                .orElseThrow(() -> new UserNotFoundException("Trainer not found with username: " + username));
     }
 
     @Override

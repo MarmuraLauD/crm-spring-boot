@@ -1,5 +1,8 @@
 package com.gym.crmspringboot.service.impl;
 
+import com.gym.crmspringboot.dto.request.UpdateTrainerRequest;
+import com.gym.crmspringboot.exception.UserNotFoundException;
+import com.gym.crmspringboot.mapper.TrainerMapper;
 import com.gym.crmspringboot.model.Role;
 import com.gym.crmspringboot.model.Trainer;
 import com.gym.crmspringboot.repository.TrainerRepository;
@@ -20,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,6 +38,9 @@ class TrainerServiceImplTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private TrainerMapper trainerMapper;
 
     @InjectMocks
     private TrainerServiceImpl trainerService;
@@ -65,17 +72,42 @@ class TrainerServiceImplTest {
     @Test
     void update_Success() {
         // Arrange
-        Trainer trainer = new Trainer();
-        trainer.setUsername("Jane.Doe");
-        when(trainerRepository.save(trainer)).thenReturn(trainer);
+        String username = "Jane.Doe";
+
+        UpdateTrainerRequest request = UpdateTrainerRequest.builder()
+                .firstName("JaneUpdated")
+                .lastName("Doe")
+                .isActive(true)
+                .build();
+
+        Trainer existingTrainer = Trainer.builder()
+                .username(username)
+                .firstName("Jane")
+                .lastName("Doe")
+                .active(true)
+                .build();
+
+        when(trainerRepository.findByUsername(username)).thenReturn(Optional.of(existingTrainer));
+        when(trainerRepository.save(any(Trainer.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        doAnswer(invocation -> {
+            UpdateTrainerRequest req = invocation.getArgument(0);
+            Trainer trainer = invocation.getArgument(1);
+            trainer.setFirstName(req.firstName());
+            trainer.setLastName(req.lastName());
+            trainer.setActive(req.isActive());
+            return null;
+        }).when(trainerMapper).updateTrainerFromRequest(any(UpdateTrainerRequest.class), any(Trainer.class));
 
         // Act
-        Trainer result = trainerService.update(trainer);
+        Trainer result = trainerService.update(username, request);
 
         // Assert
         assertNotNull(result);
         assertEquals("Jane.Doe", result.getUsername());
-        verify(trainerRepository).save(trainer);
+        assertEquals("JaneUpdated", result.getFirstName());
+        verify(trainerRepository).findByUsername(username);
+        verify(trainerRepository).save(existingTrainer);
     }
 
     @Test
@@ -102,7 +134,7 @@ class TrainerServiceImplTest {
 
         // Act
         // Assert
-        assertThrows(IllegalArgumentException.class, () -> trainerService.findByUsername(username));
+        assertThrows(UserNotFoundException.class, () -> trainerService.findByUsername(username));
     }
 
     @Test

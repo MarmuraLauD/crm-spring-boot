@@ -49,14 +49,18 @@ public class TrainerWorkloadClient {
     }
 
     public void updateWorkload(WorkloadRequest workloadRequest, String token) {
-        jmsTemplate.convertAndSend("workload.queue", workloadRequest, message -> {
-            message.setStringProperty("Authorization", token);
-            String transactionId = MDC.get("transactionId");
-            if (transactionId != null) {
-                message.setStringProperty("X-Transaction-Id", transactionId);
-            }
-            return message;
-        });
+        try {
+            jmsTemplate.convertAndSend("workload.queue", workloadRequest, message -> {
+                message.setStringProperty("Authorization", token);
+                String transactionId = MDC.get("transactionId");
+                if (transactionId != null) {
+                    message.setStringProperty("X-Transaction-Id", transactionId);
+                }
+                return message;
+            });
+        } catch (NullPointerException e) {
+            throw new IllegalStateException("Discovery Server is unavailable or JMS components are not initialized", e);
+        }
     }
 
     @CircuitBreaker(name = "workloadService", fallbackMethod = "getTrainerWorkloadFallback")

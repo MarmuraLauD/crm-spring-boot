@@ -2,8 +2,10 @@ package com.gym.crmspringboot.service.impl;
 
 import com.gym.crmspringboot.client.TrainerWorkloadClient;
 import com.gym.crmspringboot.dto.ActionType;
+import com.gym.crmspringboot.dto.request.UpdateTraineeRequest;
 import com.gym.crmspringboot.dto.request.WorkloadRequest;
 import com.gym.crmspringboot.exception.UserNotFoundException;
+import com.gym.crmspringboot.mapper.TraineeMapper;
 import com.gym.crmspringboot.model.Role;
 import com.gym.crmspringboot.model.Trainee;
 import com.gym.crmspringboot.model.Trainer;
@@ -36,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,14 +48,22 @@ class TraineeServiceImplTest {
 
     @Mock
     private TrainerRepository trainerRepository;
+
     @Mock
     private TraineeRepository traineeRepository;
+
     @Mock
     private CredentialsService credentialsService;
+
     @Mock
     private MeterRegistry meterRegistry;
+
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private TraineeMapper traineeMapper;
+
     @Mock
     private TrainerWorkloadClient workloadClient;
 
@@ -95,17 +106,43 @@ class TraineeServiceImplTest {
     @Test
     void updateTrainee_Success() {
         // Arrange
-        Trainee trainee = new Trainee();
-        trainee.setUsername("John.Doe");
-        when(traineeRepository.save(trainee)).thenReturn(trainee);
+        String username = "John.Doe";
+
+        UpdateTraineeRequest request = UpdateTraineeRequest.builder()
+                .firstName("JohnUpdated")
+                .lastName("Doe")
+                .isActive(true)
+                .build();
+
+        Trainee existingTrainee = Trainee.builder()
+                .username(username)
+                .firstName("John")
+                .lastName("Doe")
+                .active(true)
+                .build();
+
+        when(traineeRepository.findByUsername(username)).thenReturn(Optional.of(existingTrainee));
+
+        when(traineeRepository.save(any(Trainee.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        doAnswer(invocation -> {
+            UpdateTraineeRequest req = invocation.getArgument(0);
+            Trainee trainee = invocation.getArgument(1);
+            trainee.setFirstName(req.firstName());
+            trainee.setLastName(req.lastName());
+            trainee.setActive(req.isActive());
+            return null;
+        }).when(traineeMapper).updateTraineeFromRequest(any(UpdateTraineeRequest.class), any(Trainee.class));
 
         // Act
-        Trainee result = traineeService.updateTrainee(trainee);
+        Trainee result = traineeService.updateTrainee(username, request);
 
         // Assert
         assertNotNull(result);
         assertEquals("John.Doe", result.getUsername());
-        verify(traineeRepository).save(trainee);
+        assertEquals("JohnUpdated", result.getFirstName());
+        verify(traineeRepository).findByUsername(username);
+        verify(traineeRepository).save(existingTrainee);
     }
 
     @Test

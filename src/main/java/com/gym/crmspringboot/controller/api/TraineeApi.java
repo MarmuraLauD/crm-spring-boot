@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Tag(name = "Trainee Management", description = "Endpoints for managing gym trainees")
 public interface TraineeApi {
@@ -16,6 +18,7 @@ public interface TraineeApi {
     @Operation(summary = "Register a new Trainee", description = "Creates a new trainee profile and returns generated credentials.")
     @ApiResponse(responseCode = "201", description = "Trainee successfully created")
     @ApiResponse(responseCode = "400", description = "Validation failed")
+    @ResponseStatus(HttpStatus.CREATED)
     RegistrationResponse registerTrainee(TraineeRegistrationRequest request);
 
     @Operation(summary = "Get Trainee Profile", description = "Retrieves a trainee's profile by username.")
@@ -28,7 +31,7 @@ public interface TraineeApi {
     @ApiResponse(responseCode = "200", description = "Profile updated successfully")
     @ApiResponse(responseCode = "400", description = "Validation failed")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
-    TraineeProfileResponse updateTraineeProfile(UpdateTraineeRequest updateTraineeRequest);
+    TraineeProfileResponse updateTraineeProfile(String username, UpdateTraineeRequest updateTraineeRequest);
 
     @Operation(summary = "Delete Trainee Profile", description = "Deletes a trainee's profile completely by username.")
     @ApiResponse(responseCode = "200", description = "Profile deleted successfully")

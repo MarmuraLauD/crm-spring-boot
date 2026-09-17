@@ -2,8 +2,10 @@ package com.gym.crmspringboot.service.impl;
 
 import com.gym.crmspringboot.client.TrainerWorkloadClient;
 import com.gym.crmspringboot.dto.ActionType;
+import com.gym.crmspringboot.dto.request.UpdateTraineeRequest;
 import com.gym.crmspringboot.dto.request.WorkloadRequest;
 import com.gym.crmspringboot.exception.UserNotFoundException;
+import com.gym.crmspringboot.mapper.TraineeMapper;
 import com.gym.crmspringboot.model.Role;
 import com.gym.crmspringboot.model.Trainee;
 import com.gym.crmspringboot.model.Trainer;
@@ -37,6 +39,7 @@ public class TraineeServiceImpl implements TraineeService {
     private AtomicInteger activeTraineesGauge;
     private final PasswordEncoder passwordEncoder;
     private final TrainerWorkloadClient workloadClient;
+    private final TraineeMapper traineeMapper;
 
     @PostConstruct
     public void initMetrics() {
@@ -79,8 +82,12 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     @Transactional
     @Timed(value = "trainee_service.update.time", description = "Time taken to update trainee")
-    public Trainee updateTrainee(Trainee trainee) {
-        log.info("Updating trainee profile with username: {}", trainee.getUsername());
+    public Trainee updateTrainee(String username, UpdateTraineeRequest request) {
+        log.info("Updating trainee profile with username: {}", username);
+        Trainee trainee = traineeRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Trainee not found"));
+
+        traineeMapper.updateTraineeFromRequest(request, trainee);
         return traineeRepository.save(trainee);
     }
 
