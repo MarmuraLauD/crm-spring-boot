@@ -116,6 +116,7 @@ class TraineeControllerTest {
         String username = "John.Doe";
 
         UpdateTraineeRequest request = UpdateTraineeRequest.builder()
+                .username(username)
                 .firstName("JohnUpdated")
                 .lastName("Doe")
                 .isActive(true)

@@ -32,44 +32,55 @@ public class TrainingManagementSteps {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private AddTrainingRequest addTrainingRequest;
     private ResultActions resultActions;
+    private AddTrainingRequest addTrainingRequest;
 
     @Given("a valid add training request for trainee {string} and trainer {string}")
-    public void aValidAddTrainingRequest(String traineeUsername, String trainerUsername) {
+    public void aValidAddTrainingRequestForTraineeAndTrainer(String traineeUsername, String trainerUsername) {
         addTrainingRequest = AddTrainingRequest.builder()
                 .traineeUsername(traineeUsername)
                 .trainerUsername(trainerUsername)
-                .trainingName("Yoga Basics")
+                .trainingName("Morning Yoga")
                 .trainingDate(LocalDate.now().plusDays(1))
                 .trainingDuration(60.0)
                 .build();
     }
 
-    @When("a GET request is made for training types to {string}")
-    public void aGetRequestIsMadeForTrainingTypesTo(String endpoint) throws Exception {
+    @Given("an invalid add training request with missing trainee username and trainer {string}")
+    public void anInvalidAddTrainingRequestWithMissingTraineeUsernameAndTrainer(String trainerUsername) {
+        addTrainingRequest = AddTrainingRequest.builder()
+                .traineeUsername(null)
+                .trainerUsername(trainerUsername)
+                .trainingName("Morning Yoga")
+                .trainingDate(LocalDate.now().plusDays(1))
+                .trainingDuration(60.0)
+                .build();
+    }
+
+    @When("a GET request is made by trainer to get training types at {string}")
+    public void aGetRequestIsMadeByTrainerToGetTrainingTypesAt(String endpoint) throws Exception {
         resultActions = mockMvc.perform(get(endpoint)
                 .with(user("trainer_user").roles("TRAINER")));
     }
 
-    @When("a GET request is made by trainer for trainee trainings to {string}")
-    public void aGetRequestIsMadeByTrainerForTraineeTrainingsTo(String endpoint) throws Exception {
-        resultActions = mockMvc.perform(get(endpoint)
-                .with(user("trainer_user").roles("TRAINER")));
-    }
-
-    @When("a GET request is made by trainer for trainer trainings to {string}")
-    public void aGetRequestIsMadeByTrainerForTrainerTrainingsTo(String endpoint) throws Exception {
-        resultActions = mockMvc.perform(get(endpoint)
-                .with(user("trainer_user").roles("TRAINER")));
-    }
-
-    @When("a POST request is made for adding training to {string}")
-    public void aPostRequestIsMadeForAddingTrainingTo(String endpoint) throws Exception {
+    @When("a POST request is made by trainer to add training at {string}")
+    public void aPostRequestIsMadeByTrainerToAddTrainingAt(String endpoint) throws Exception {
         resultActions = mockMvc.perform(post(endpoint)
                 .with(user("trainer_user").roles("TRAINER"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(addTrainingRequest)));
+    }
+
+    @When("a GET request is made by trainer to get trainee trainings at {string}")
+    public void aGetRequestIsMadeByTrainerToGetTraineeTrainingsAt(String endpoint) throws Exception {
+        resultActions = mockMvc.perform(get(endpoint)
+                .with(user("trainer_user").roles("TRAINER")));
+    }
+
+    @When("a GET request is made by trainer to get trainer trainings at {string}")
+    public void aGetRequestIsMadeByTrainerToGetTrainerTrainingsAt(String endpoint) throws Exception {
+        resultActions = mockMvc.perform(get(endpoint)
+                .with(user("trainer_user").roles("TRAINER")));
     }
 
     @Then("the training response status should be {int}")
@@ -81,7 +92,6 @@ public class TrainingManagementSteps {
     public void theResponseShouldContainAListOfTrainingTypes() throws Exception {
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
         List<TrainingTypeItemResponse> response = objectMapper.readValue(responseBody, new TypeReference<>() {});
-
         assertNotNull(response);
     }
 
@@ -89,7 +99,6 @@ public class TrainingManagementSteps {
     public void theResponseShouldBeAListOfTraineeTrainings() throws Exception {
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
         List<TraineeTrainingItemResponse> response = objectMapper.readValue(responseBody, new TypeReference<>() {});
-
         assertNotNull(response);
     }
 
@@ -97,7 +106,6 @@ public class TrainingManagementSteps {
     public void theResponseShouldBeAListOfTrainerTrainings() throws Exception {
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
         List<TrainerTrainingItemResponse> response = objectMapper.readValue(responseBody, new TypeReference<>() {});
-
         assertNotNull(response);
     }
 }
