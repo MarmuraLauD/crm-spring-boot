@@ -1,6 +1,8 @@
 package com.gym.crmspringboot.facade;
 
 import com.gym.crmspringboot.dto.request.AddTrainingRequest;
+import com.gym.crmspringboot.dto.request.UpdateTraineeRequest;
+import com.gym.crmspringboot.dto.request.UpdateTrainerRequest;
 import com.gym.crmspringboot.mapper.TrainingMapper;
 import com.gym.crmspringboot.model.Trainee;
 import com.gym.crmspringboot.model.Trainer;
@@ -31,8 +33,8 @@ public class GymFacade {
         return traineeService.createTrainee(trainee);
     }
 
-    public Trainee updateTrainee(Trainee trainee) {
-        return traineeService.updateTrainee(trainee);
+    public Trainee updateTrainee(String username, UpdateTraineeRequest request) {
+        return traineeService.updateTrainee(username, request);
     }
 
     public void deleteTrainee(String username) {
@@ -62,8 +64,8 @@ public class GymFacade {
         return trainerService.create(trainer);
     }
 
-    public Trainer updateTrainer(Trainer trainer) {
-        return trainerService.update(trainer);
+    public Trainer updateTrainer(String username, UpdateTrainerRequest request) {
+        return trainerService.update(username, request);
     }
 
     public Trainer getTrainerByUsername(String username) {

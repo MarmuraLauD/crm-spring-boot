@@ -35,7 +35,6 @@ public class TrainerController implements TrainerApi {
     @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('TRAINER')")
     public RegistrationResponse registerTrainer(@Valid @RequestBody TrainerRegistrationRequest request) {
         Trainer trainer = trainerMapper.toEntity(request);
 
@@ -58,10 +57,10 @@ public class TrainerController implements TrainerApi {
     @PutMapping("/{username}")
     @PreAuthorize("hasRole('TRAINER')")
     public TrainerProfileResponse updateTrainerProfile(
-            @RequestBody UpdateTrainerRequest updateTrainerRequest) {
+            @PathVariable String username,
+            @RequestBody @Valid UpdateTrainerRequest updateTrainerRequest) {
 
-        Trainer trainer = trainerMapper.toEntity(updateTrainerRequest);
-        Trainer updatedTrainer = gymFacade.updateTrainer(trainer);
+        Trainer updatedTrainer = gymFacade.updateTrainer(username, updateTrainerRequest);
         return trainerMapper.toProfileResponse(updatedTrainer);
     }
 

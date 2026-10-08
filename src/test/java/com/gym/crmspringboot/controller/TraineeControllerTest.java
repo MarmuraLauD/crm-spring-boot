@@ -116,13 +116,18 @@ class TraineeControllerTest {
         String username = "John.Doe";
 
         UpdateTraineeRequest request = UpdateTraineeRequest.builder()
+                .username(username)
                 .firstName("JohnUpdated")
                 .lastName("Doe")
                 .isActive(true)
                 .build();
 
-        Trainee trainee = new Trainee();
-        Trainee updatedTrainee = new Trainee();
+        Trainee updatedTrainee = Trainee.builder()
+                .username(username)
+                .firstName("JohnUpdated")
+                .lastName("Doe")
+                .active(true)
+                .build();
 
         TraineeProfileResponse response = TraineeProfileResponse.builder()
                 .firstName("JohnUpdated")
@@ -130,12 +135,10 @@ class TraineeControllerTest {
                 .isActive(true)
                 .build();
 
-        when(traineeMapper.toEntity(any(UpdateTraineeRequest.class))).thenReturn(trainee);
-        when(gymFacade.updateTrainee(trainee)).thenReturn(updatedTrainee);
+        when(gymFacade.updateTrainee(eq(username), any(UpdateTraineeRequest.class))).thenReturn(updatedTrainee);
         when(traineeMapper.toProfileResponse(updatedTrainee)).thenReturn(response);
 
-        // Act
-        // Assert
+        // Act & Assert
         mockMvc.perform(put("/api/v1/trainees/{username}", username)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))

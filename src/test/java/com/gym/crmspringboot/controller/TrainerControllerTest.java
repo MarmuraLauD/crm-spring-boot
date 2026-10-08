@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -109,13 +110,18 @@ class TrainerControllerTest {
         String username = "Jane.Doe";
 
         UpdateTrainerRequest request = UpdateTrainerRequest.builder()
+                .username(username)
                 .firstName("JaneUpdated")
                 .lastName("Doe")
                 .isActive(true)
                 .build();
 
-        Trainer trainer = new Trainer();
-        Trainer updatedTrainer = new Trainer();
+        Trainer updatedTrainer = Trainer.builder()
+                .username(username)
+                .firstName("JaneUpdated")
+                .lastName("Doe")
+                .active(true)
+                .build();
 
         TrainerProfileResponse response = TrainerProfileResponse.builder()
                 .firstName("JaneUpdated")
@@ -123,12 +129,10 @@ class TrainerControllerTest {
                 .isActive(true)
                 .build();
 
-        when(trainerMapper.toEntity(any(UpdateTrainerRequest.class))).thenReturn(trainer);
-        when(gymFacade.updateTrainer(trainer)).thenReturn(updatedTrainer);
+        when(gymFacade.updateTrainer(eq(username), any(UpdateTrainerRequest.class))).thenReturn(updatedTrainer);
         when(trainerMapper.toProfileResponse(updatedTrainer)).thenReturn(response);
 
-        // Act
-        // Assert
+        // Act & Assert
         mockMvc.perform(put("/api/v1/trainers/{username}", username)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))

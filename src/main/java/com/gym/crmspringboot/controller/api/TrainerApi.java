@@ -29,7 +29,7 @@ public interface TrainerApi {
     @ApiResponse(responseCode = "200", description = "Profile updated successfully")
     @ApiResponse(responseCode = "400", description = "Validation failed")
     @ApiResponse(responseCode = "401", description = "Unauthorized")
-    TrainerProfileResponse updateTrainerProfile(UpdateTrainerRequest updateTrainerRequest);
+    TrainerProfileResponse updateTrainerProfile(String username, UpdateTrainerRequest updateTrainerRequest);
 
     @Operation(summary = "Get Unassigned Trainers", description = "Retrieves a list of active trainers not currently assigned to the specified trainee.")
     @ApiResponse(responseCode = "200", description = "List retrieved successfully")

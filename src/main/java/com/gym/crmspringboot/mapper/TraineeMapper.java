@@ -7,6 +7,7 @@ import com.gym.crmspringboot.dto.response.TraineeProfileResponse;
 import com.gym.crmspringboot.model.Trainee;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring",
@@ -17,7 +18,7 @@ public interface TraineeMapper {
     Trainee toEntity(TraineeRegistrationRequest request);
 
     @Mapping(target = "username", ignore = true)
-    Trainee toEntity(UpdateTraineeRequest request);
+    void updateTraineeFromRequest(UpdateTraineeRequest request, @MappingTarget Trainee trainee);
 
     TraineeProfileResponse toProfileResponse(Trainee trainee);
 
