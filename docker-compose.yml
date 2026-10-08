@@ -11,6 +11,32 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      retries: 10
+    networks:
+      - gym-net
+
+  mongo:
+    image: mongo:8
+    container_name: gym_workload_mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - gym-net
+
+  activemq:
+    image: rmohr/activemq:latest
+    container_name: activemq
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+    networks:
+      - gym-net
 
   prometheus:
     image: prom/prometheus
@@ -19,18 +45,33 @@ services:
     ports:
       - "9090:9090"
     networks:
-      - monitoring
+      - gym-net
 
-  activemq:
-    image: rmohr/activemq:latest
-    container_name: activemq
+  trainer-workload:
+    build: ../trainer-workload
+    image: trainer-workload:1.0
+    container_name: trainer-workload
+    depends_on:
+      - mongo
+      - activemq
     ports:
-      - "61616:61616"
-      - "8161:8161"
+      - "8081:8081"
+    environment:
+      EUREKA_CLIENT_ENABLED: "false"
+      SPRING_ACTIVEMQ_BROKER_URL: tcp://activemq:61616
+      SPRING_MONGODB_HOST: mongo
+      MQ_ADMIN_USERNAME: ${MQ_ADMIN_USERNAME}
+      MQ_ADMIN_PASSWORD: ${MQ_ADMIN_PASSWORD}
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - gym-net
 
-volumes:
-  postgres_data:
-
-networks:
-  monitoring:
-    driver: bridge
+  crm:
+    build: .
+    image: gym-crm:1.0
+    container_name: gym-crm
+    depends_on:
+      postgres:
+        condition: service_healthy
